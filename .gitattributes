@@ -1,0 +1,3 @@
+# Keep the price history byte-for-byte (the scripts append to it with Windows line endings).
+data/history.csv binary
+*.clixml binary

@@ -1,0 +1,135 @@
+{
+  "homeArea": "Belle River",
+  "areas": [
+    { "name": "Belle River",      "postal": "N0R1A0" },
+    { "name": "Tecumseh",         "postal": "N8N1A1" },
+    { "name": "Windsor East",     "postal": "N8T1A1" },
+    { "name": "Windsor Downtown", "postal": "N9A1A1" },
+    { "name": "South Windsor",    "postal": "N9G1A1" },
+    { "name": "LaSalle",          "postal": "N9J1A1" },
+    { "name": "Amherstburg",      "postal": "N9V1A1" },
+    { "name": "Essex",            "postal": "N8M1A1" },
+    { "name": "Kingsville",       "postal": "N9Y1A1" },
+    { "name": "Leamington",       "postal": "N8H1A1" }
+  ],
+
+  "extraMerchants": ["Shoppers Drug Mart", "Rexall", "Guardian", "I.D.A.", "PharmaChoice"],
+  "excludeMerchants": [],
+
+  "watchlist": [
+    "chicken breast",
+    "chicken thighs",
+    "chicken drumsticks",
+    { "term": "ground beef" },
+    "pork chops",
+    { "term": "bacon", "exclude": ["bits", "chips", "flavour", "dog"] },
+    "salmon",
+    { "term": "eggs", "exclude": ["chocolate", "easter", "kinder", "plant"] },
+    { "term": "milk", "exclude": ["chocolate", "bar", "cookie", "dog", "cat", "body", "lotion", "milkshake", "shake", "coconut", "evaporated", "condensed", "rusk", "ice milk", "enhancer"] },
+    { "term": "butter", "exclude": ["peanut", "cookie", "chicken", "popcorn", "body", "cocoa", "shea", "tart", "twists", "cracker"] },
+    { "term": "cheese", "exclude": ["cake", "cracker", "puffs", "pizza", "dip", "burger", "macaroni", "snack", "chips", "stix", "crunchies", "hummus"] },
+    { "term": "yogurt", "exclude": ["dog", "bar", "covered"] },
+    { "term": "bread", "exclude": ["crumbs", "garlic", "shortbread", "mix"] },
+    { "term": "rice", "exclude": ["cracker", "cake", "snack", "krispies", "minis", "chips", "noodle"] },
+    { "term": "pasta", "exclude": ["sauce"] },
+    { "term": "cereal", "exclude": ["bar", "snack"] },
+    { "term": "coffee", "exclude": ["mate", "creamer", "maker", "table", "mug", "enhancer"] },
+    "bananas",
+    { "term": "apples", "exclude": ["sauce", "juice", "chips", "cider", "pie"] },
+    { "term": "potatoes", "exclude": ["chips", "salad"] },
+    "onions",
+    { "term": "tomatoes", "exclude": ["sauce", "paste", "soup"] },
+    "lettuce",
+    "strawberries",
+    "frozen vegetables",
+    "orange juice",
+    "bathroom tissue",
+    "toilet paper",
+    "paper towels",
+    "laundry detergent"
+  ],
+
+  "picks": [
+    { "section": "Protein", "groups": [
+      { "name": "Chicken", "aisle": "Meat & Poultry", "items": [
+        "chicken breast", "chicken thighs", "chicken drumsticks", "chicken wings", "chicken legs", "whole chicken", "ground chicken"
+      ] },
+      { "name": "Beef", "aisle": "Meat & Poultry", "items": [
+        "ground beef", { "term": "steak", "exclude": ["spice", "sauce", "seasoning", "fries"] },
+        "beef roast", "stewing beef", "burgers", "meatballs"
+      ] },
+      { "name": "Pork", "aisle": "Meat & Poultry", "items": [
+        "pork chops", "pork tenderloin", "pork loin", "pork shoulder", "ground pork", "ribs", "bacon", "sausages",
+        { "term": "ham", "aisle": "Deli" }
+      ] },
+      { "name": "Eggs", "aisle": "Dairy & Eggs", "items": [
+        { "term": "eggs", "exclude": ["whites", "chocolate", "easter"] }
+      ] },
+      { "name": "Other meat & fish", "aisle": "Meat & Poultry", "items": [
+        "turkey", "ground turkey", "lamb",
+        { "term": "salmon", "aisle": "Seafood" }, { "term": "shrimp", "aisle": "Seafood" },
+        { "term": "tilapia", "aisle": "Seafood" }, { "term": "cod", "aisle": "Seafood" },
+        { "term": "haddock", "aisle": "Seafood" }, { "term": "trout", "aisle": "Seafood" }
+      ] }
+    ] },
+    { "section": "Vegetables", "groups": [
+      { "name": "Vegetables", "aisle": "Produce", "items": [
+        { "term": "potatoes", "exclude": ["sweet"] }, "sweet potatoes", "onions",
+        { "term": "garlic", "exclude": ["paste", "bread", "powder", "sauce", "ginger"] }, "carrots", "celery",
+        "tomatoes", "cucumbers", { "term": "peppers", "exclude": ["stuffed"] }, "lettuce", "spinach", "salad",
+        "broccoli", "cauliflower", "cabbage",
+        { "term": "corn", "exclude": ["flakes", "chips", "starch", "syrup", "pops", "tortilla", "meal", "popping", "love corn"] },
+        "mushrooms", "squash", "zucchini", "asparagus", "green beans", "brussels sprouts"
+      ] }
+    ] },
+    { "section": "Fruits", "groups": [
+      { "name": "Fruits", "aisle": "Produce", "items": [
+        "apples", "bananas", "oranges", "clementines", "mandarins",
+        { "term": "grapes", "exclude": ["tomato", "juice", "jelly"] },
+        { "term": "strawberries", "exclude": ["tomato", "jam", "yogurt", "cereal"] },
+        { "term": "blueberries", "exclude": ["cereal", "muffin", "yogurt", "puffs"] },
+        { "term": "raspberries", "exclude": ["jam", "yogurt"] }, "pears",
+        { "term": "lemons", "exclude": ["juice"] }, "limes", "avocados", "pineapple",
+        { "term": "mangoes", "exclude": ["pulp", "juice", "chutney", "pickle"] }, "watermelon", "cantaloupe", "kiwi"
+      ] }
+    ] },
+    { "section": "Everything else", "groups": [
+      { "name": "Dairy", "aisle": "Dairy & Eggs", "items": [
+        "milk", "butter", "margarine", "cheddar", "mozzarella",
+        { "term": "cheese", "exclude": ["cream cheese", "cottage"] }, "cream cheese", "cottage cheese",
+        "sour cream", "yogurt", { "term": "cream", "exclude": ["sour", "cheese", "ice", "creamer", "polident"] }
+      ] },
+      { "name": "Deli", "aisle": "Deli", "items": ["salami", "wieners", "hot dogs", "hummus", "rotisserie chicken", "sliced turkey"] },
+      { "name": "Bakery", "aisle": "Bakery", "items": ["bread", "buns", "bagels", "tortillas", "english muffins", "croissants", "pitas", "naan"] },
+      { "name": "Pantry", "aisle": "Pantry", "items": [
+        "rice", "pasta", "pasta sauce", "cereal", "oatmeal", "flour", "sugar", "olive oil", "canola oil",
+        "peanut butter", "jam", "honey", "soup", "beans", { "term": "tuna", "aisle": "Seafood" }, "ketchup", "mayonnaise", "noodles"
+      ] },
+      { "name": "Frozen", "aisle": "Frozen", "items": ["frozen vegetables", "frozen fruit", "pizza", "fries", "ice cream", "perogies", "waffles"] },
+      { "name": "Drinks", "aisle": "Beverages", "items": ["coffee", "tea", "orange juice", "apple juice", "pop", "sparkling water", "water"] },
+      { "name": "Household", "aisle": "Household", "items": ["bathroom tissue", "paper towels", "laundry detergent", "dish soap", "garbage bags", "facial tissues"] },
+      { "name": "Health & beauty", "aisle": "Health & Beauty", "items": ["toothpaste", "shampoo", "deodorant"] },
+      { "name": "Baby & pet", "aisle": "Baby", "items": ["diapers", { "term": "dog food", "aisle": "Pet" }, { "term": "cat food", "aisle": "Pet" }] },
+      { "name": "Snacks & candy", "aisle": "Snacks & Candy", "items": ["chips", "crackers", "cookies", "chocolate", "candy", "popcorn", "nuts", "granola bars"] }
+    ] }
+  ],
+
+  "discoveryTerms": ["meat", "fresh", "fruit", "vegetables", "frozen", "dairy", "snacks", "pantry", "beverages", "bakery", "deli", "seafood"],
+
+  "aislePriority": [
+    ["Meat & Poultry", "Produce"],
+    ["Seafood", "Dairy & Eggs"],
+    ["Deli", "Bakery", "Pantry", "Frozen"],
+    ["Beverages", "Plant-Based", "Baby", "Household", "Health & Beauty", "Pet", "Home & General", "Other"],
+    ["Snacks & Candy"]
+  ],
+
+  "maxPickPrice": 35,
+
+  "membershipStores": ["Costco"],
+  "myMemberships": ["PC Optimum", "Scene+", "moi", "M&M Rewards", "Costco"],
+
+  "trendDays": 90,
+  "requestDelayMs": 150,
+  "openReportAfterRun": false
+}

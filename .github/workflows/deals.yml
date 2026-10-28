@@ -1,0 +1,73 @@
+# Downloads the Windsor-Essex flyers twice a week on GitHub's computers, saves the price
+# history back to this repository, and publishes the deals page on GitHub Pages.
+name: Update grocery deals
+
+on:
+  schedule:
+    - cron: '7 13 * * 4,6'   # Thursday and Saturday, 13:07 UTC = about 8-9 AM in Windsor
+  workflow_dispatch:          # "Run workflow" button for a manual refresh
+
+permissions:
+  contents: write   # commit data/history.csv
+  pages: write
+  id-token: write
+
+concurrency:
+  group: deals
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Windsor time
+        shell: powershell
+        run: tzutil /s "Eastern Standard Time"
+
+      # Fine print fetched on the last run, so Saturday doesn't re-download Thursday's.
+      - name: Restore fine-print cache
+        uses: actions/cache@v4
+        with:
+          path: data/item-details.clixml
+          key: fineprint-${{ github.run_id }}
+          restore-keys: fineprint-
+
+      - name: Download flyers and build the page
+        shell: powershell
+        run: ./app/Get-Deals.ps1
+
+      - name: Save price history
+        shell: powershell
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/history.csv
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "Price history $(Get-Date -Format yyyy-MM-dd)"
+            git push
+          }
+          exit 0
+
+      - name: Prepare site
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force _site | Out-Null
+          Copy-Item latest-deals.html _site/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

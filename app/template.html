@@ -1,0 +1,1027 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windsor-Essex Deal Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#076ae2; --blue-dk:#0558bd; --store:#046295; --ink:#1f2833; --muted:#8493a6; --bg:#f2f4f7;
+  --side:#fff; --line:#e3e7ec; --chip:#e8f0fd; --red:#d93025; --green:#0a7d3e; --green-bg:#e3f4ea;
+  --shadow:0 1px 2px rgba(31,40,51,.25); --shadow-hi:0 4px 14px rgba(31,40,51,.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.4 "DM Sans","Segoe UI",system-ui,sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.ic.fill{fill:currentColor}
+
+/* sidebar */
+.side{position:fixed;top:0;left:0;bottom:0;width:200px;background:var(--side);border-right:1px solid var(--line);overflow-y:auto;padding:14px 0 20px;z-index:20}
+.brand{display:block;padding:0 18px 14px;font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--blue);line-height:1}
+.brand small{display:block;font-size:11px;font-weight:500;letter-spacing:0;color:var(--muted);margin-top:4px}
+.loc{display:flex;align-items:center;gap:6px;margin:0 12px 10px;padding:9px 10px;border-radius:6px;background:#eef3fb;font-size:14px;font-weight:500;position:relative}
+.loc select{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.loc .grow{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snav a{display:flex;align-items:center;gap:10px;padding:7px 18px;font-size:16px}
+.snav a:hover{color:var(--blue)}
+.snav a.on{color:var(--blue);font-weight:700;box-shadow:inset 4px 0 0 var(--blue)}
+.snav .cnt{margin-left:auto;font-size:11px;color:var(--store);background:#e6f1f7;border-radius:3px;padding:1px 6px;min-width:22px;text-align:center}
+.shead{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted);padding:14px 18px 4px;text-transform:uppercase}
+.sfoot{font-size:11.5px;color:var(--muted);padding:16px 18px 0;line-height:1.5}
+
+/* top bar */
+.main{margin-left:200px;min-height:100vh}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:#fff;display:flex;align-items:center;gap:18px;padding:10px 24px;border-bottom:1px solid var(--line)}
+.sbox{flex:1;max-width:460px;display:flex;align-items:center;gap:8px;border:1px solid #c9d1da;border-radius:50px;padding:0 14px;height:40px;background:#fff}
+.sbox:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(7,106,226,.15)}
+.sbox input{flex:1;border:0;outline:0;font:inherit;font-size:15px;background:none;color:var(--ink);min-width:0}
+.sbox .clr{color:var(--muted);display:none}
+.sbox.has .clr{display:block}
+.tlinks{display:flex;align-items:center;gap:20px;margin-left:auto;font-size:15px;white-space:nowrap}
+.tlinks a,.tlinks label{display:flex;align-items:center;gap:6px;position:relative;cursor:pointer}
+.tlinks .badge{position:absolute;top:-7px;left:11px;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;border-radius:9px;padding:0 5px;min-width:17px;text-align:center;line-height:16px}
+.tloc{position:relative}
+.tloc select{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* sub-tabs */
+.tabs{display:flex;gap:28px;padding:0 24px;background:#fff;border-bottom:1px solid var(--line);align-items:flex-end}
+.tabs a{padding:12px 2px 9px;font-size:15px;color:var(--ink);border-bottom:4px solid transparent}
+.tabs a .n{color:var(--muted);font-size:13px;margin-left:3px}
+.tabs a.on{color:var(--blue);border-bottom-color:var(--blue)}
+.tabs .right{margin-left:auto;padding-bottom:12px;font-size:13px;color:var(--ink)}
+.page{padding:20px 24px 60px}
+.h{font-size:15px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;margin:6px 0 14px}
+.h.mt{margin-top:30px}
+.muted{color:var(--muted)}
+
+/* flyer cards */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:18px}
+.fcard{background:#fff;box-shadow:var(--shadow);padding:8px;display:flex;flex-direction:column;transition:box-shadow .15s}
+.fcard:hover{box-shadow:var(--shadow-hi)}
+.fcard .thumb{height:180px;background:#f6f7f9;overflow:hidden;display:flex;align-items:flex-start;justify-content:center}
+.fcard .thumb img{width:100%;height:100%;object-fit:cover;object-position:top}
+.fcard .who{display:flex;align-items:center;gap:7px;margin-top:9px}
+.fcard .who img{width:34px;height:28px;object-fit:contain}
+.fcard .nm{color:var(--store);font-size:15.5px;line-height:1.2}
+.fcard .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.fcard .match{color:var(--blue);font-size:13px;font-weight:700;margin-top:3px}
+
+/* clippings (items) */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:16px}
+.clip{position:relative;background:#fff;box-shadow:var(--shadow);padding:10px 10px 10px;cursor:pointer;display:flex;flex-direction:column;transition:box-shadow .15s}
+.clip:hover{box-shadow:var(--shadow-hi)}
+.clip .cimg{height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-top:12px}
+.clip .cimg img{max-width:100%;max-height:100%;object-fit:contain}
+.clip .tab{position:absolute;top:-6px;left:-6px;width:44px;height:40px;background:#fff;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;padding:3px}
+.clip .tab img{max-width:100%;max-height:100%;object-fit:contain}
+.clip .tab span{font-size:9px;font-weight:800;color:var(--store);text-align:center;line-height:1}
+.clip .add{position:absolute;top:6px;right:6px;width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:var(--shadow);color:var(--blue);display:flex;align-items:center;justify-content:center}
+.clip .add:hover{background:var(--chip)}
+.clip .add.in{background:var(--blue);color:#fff}
+.clip .add .ic{width:17px;height:17px}
+.clip .cap{margin-top:8px;display:flex;flex-direction:column;gap:2px}
+.clip .cp{font-size:18px;font-weight:800;line-height:1.1}
+.clip .cp small{font-size:12px;font-weight:500;color:var(--muted)}
+.clip .cp s{font-size:12.5px;font-weight:400;color:var(--muted);margin-left:5px}
+.clip .cn{font-size:13px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.clip .cn mark{background:#fff3b0;color:inherit}
+.clip .cm{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 8px}
+.clip .save{color:var(--red);font-weight:700}
+.clip .soon{color:var(--red)}
+.clip .trend{color:var(--green);font-weight:700}
+.row{display:grid;grid-auto-flow:column;grid-auto-columns:168px;gap:16px;overflow-x:auto;padding:8px 2px 14px;scroll-snap-type:x proximity}
+.row > *{scroll-snap-align:start}
+.wcard .cap .term{font-size:14px;font-weight:700;text-transform:capitalize}
+
+.cond{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px;margin:2px 4px 2px 0;line-height:1.5}
+.cond.mem{background:#fde8e7;color:#b3261e}
+.cond.buy{background:#fff1d6;color:#8a5a00}
+.cond.info{background:#eef1f5;color:#5b6876}
+.cond.own{background:#e3edfc;color:#0b4fa8}
+
+/* top picks */
+.phead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:6px}
+.phead h1{font-size:22px;margin:0}
+.phead p{margin:0;color:var(--muted);font-size:13.5px;flex-basis:100%}
+.sect{margin-top:26px}
+.sec{display:flex;align-items:baseline;gap:10px;font-size:24px;font-weight:800;margin:0 0 4px;padding-bottom:8px;border-bottom:3px solid var(--blue)}
+.sec .n{font-size:13px;font-weight:500;color:var(--muted)}
+.sect .h a:hover,.sec a:hover{color:var(--blue)}
+.sect .h{margin-top:18px}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:10px}
+.vcard{background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.vh{display:flex;align-items:baseline;gap:8px;padding:12px 14px 8px;border-bottom:1px solid var(--line)}
+.vh .vt{font-size:16.5px;font-weight:800;text-transform:capitalize}
+.vh .vt:hover{color:var(--blue)}
+.vh .star{color:#f5b301;font-size:15px}
+.vh .vn{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.pick{display:grid;grid-template-columns:24px 54px 1fr auto 32px;gap:10px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.pick:hover{background:#f7faff}
+.medal{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;color:#fff;background:#b8c2cc}
+.medal.m1{background:#f0a500}.medal.m2{background:#98a4b0}.medal.m3{background:#c27c3e}
+.pick > img,.pick .noimg{width:54px;height:54px;object-fit:contain;background:#fff}
+.pick .pi{min-width:0}
+.pick .ps{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:var(--store)}
+.pick .ps img{width:22px;height:16px;object-fit:contain}
+.pick .pn{font-size:13px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pick .pm{font-size:11.5px;color:var(--muted)}
+.pick .pm .save{color:var(--red);font-weight:700}
+.pick .pp{text-align:right;white-space:nowrap}
+.pick .big{font-size:17px;font-weight:800}
+.pick .big small{font-size:11.5px;font-weight:500;color:var(--muted)}
+.pick .big s{display:block;font-size:11.5px;font-weight:400;color:var(--muted)}
+.pick .big s::before{content:"was ";text-decoration:none}
+.pick .ul{font-size:11.5px;color:var(--muted)}
+.pick .add{width:30px;height:30px;border-radius:50%;box-shadow:var(--shadow);color:var(--blue);display:flex;align-items:center;justify-content:center;background:#fff}
+.pick .add.in{background:var(--blue);color:#fff}
+.pick .add .ic{width:16px;height:16px}
+.pick.first{background:#fffbea}
+.pick.first:hover{background:#fff5cc}
+.vall{padding:9px 14px;font-size:13px;color:var(--blue);font-weight:700;margin-top:auto}
+.vall:hover{background:var(--chip)}
+
+/* filter bar */
+.fbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 16px}
+.fbar select,.fbar input[type=search]{font:inherit;font-size:14px;border:1px solid #c9d1da;border-radius:50px;padding:6px 12px;background:#fff;color:var(--ink)}
+.fbar input[type=search]{min-width:220px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;border:1px solid #c9d1da;background:#fff;border-radius:50px;padding:5px 12px;white-space:nowrap}
+.pill img{width:18px;height:18px;object-fit:contain}
+.pill .n{color:var(--muted);font-size:12px}
+.pill.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.pill.on .n{color:#dbe8fb}
+.pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:thin}
+.more{display:block;margin:22px auto 0;background:#fff;border:1px solid var(--blue);color:var(--blue);border-radius:50px;padding:9px 26px;font-weight:700}
+.more:hover{background:var(--chip)}
+.empty{background:#fff;box-shadow:var(--shadow);padding:40px 20px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
+.note{background:#fff;border-left:4px solid var(--blue);padding:10px 14px;font-size:13.5px;margin:0 0 18px;box-shadow:var(--shadow)}
+
+/* flyer header */
+.fhead{display:flex;align-items:center;gap:14px;background:#fff;padding:10px 24px;border-bottom:1px solid var(--line);position:sticky;top:calc(61px + env(safe-area-inset-top,0px));z-index:10}
+.fhead .backbtn{display:flex;color:var(--ink)}
+.fhead img{height:26px;max-width:90px;object-fit:contain}
+.fhead .nm{font-size:16px}
+.fhead .dt{font-size:13px}
+.fhead .heart{margin-left:auto;color:var(--ink)}
+.fhead .heart.on{color:var(--red)}
+.fhead .heart .ic{width:24px;height:24px}
+
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(31,40,51,.55);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px}
+.dlg{background:#fff;width:100%;max-width:780px;max-height:calc(100vh - 40px);overflow:auto;position:relative;display:grid;grid-template-columns:300px 1fr;gap:26px;padding:30px}
+.dlg .x{position:absolute;top:12px;right:12px;color:var(--muted)}
+.dlg .x .ic{width:24px;height:24px}
+.dlg .pic{display:flex;align-items:flex-start;justify-content:center}
+.dlg .pic img{max-width:100%;max-height:300px;object-fit:contain}
+.dlg .lg{height:22px;max-width:120px;object-fit:contain;margin-bottom:12px;display:block}
+.dlg .lgt{color:var(--store);font-weight:700;margin-bottom:10px}
+.dlg h2{font-size:17px;font-weight:700;text-transform:uppercase;margin:0 0 10px;line-height:1.3}
+.dlg .bp{font-size:30px;font-weight:800}
+.dlg .bp small{font-size:14px;font-weight:500;margin-left:3px}
+.dlg .bp s{font-size:16px;font-weight:400;color:var(--muted);margin-left:8px}
+.dlg .acts{display:flex;gap:10px;margin:18px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:2px;padding:9px 20px;font-size:14.5px;border:1px solid var(--blue);color:var(--blue);background:#fff;min-width:130px}
+.btn.solid{background:var(--blue);color:#fff}
+.btn.solid:hover{background:var(--blue-dk)}
+.btn:not(.solid):hover{background:var(--chip)}
+.dlg .story{text-transform:uppercase;font-size:14px;margin-bottom:4px}
+.dlg .valid{color:var(--muted);font-size:13px}
+.dlg .lbl{color:var(--store);font-weight:700;font-size:13px;text-transform:uppercase;margin:18px 0 6px}
+.dlg .desc{font-size:14px;line-height:1.55}
+.dlg .cmp a{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px;cursor:pointer}
+.dlg .cmp a:hover .cn{color:var(--blue)}
+.dlg .cmp img{width:28px;height:28px;object-fit:contain}
+.dlg .cmp .cs{font-size:12px;color:var(--muted)}
+.dlg .cmp .pr{font-weight:800;text-align:right;white-space:nowrap}
+.dlg .cmp .best{color:var(--green);font-size:11px;font-weight:700}
+.dlg .disc{font-style:italic;color:var(--muted);font-size:12px;margin-top:18px}
+.trendbox{background:var(--bg);padding:10px 12px;font-size:13.5px}
+.trendbox.good{background:var(--green-bg);color:var(--green);font-weight:700}
+
+/* shopping list */
+.lwrap{max-width:760px}
+.ladd{display:flex;gap:8px;margin-bottom:18px}
+.ladd input{flex:1;font:inherit;font-size:15px;border:1px solid #c9d1da;border-radius:2px;padding:10px 12px}
+.lcard{background:#fff;box-shadow:var(--shadow);margin-bottom:16px}
+.lcard .lh{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);font-weight:700}
+.lcard .lh img{height:24px;max-width:70px;object-fit:contain}
+.lcard .lh .tot{margin-left:auto;font-weight:800}
+.lrow{display:grid;grid-template-columns:24px 48px 1fr auto 28px;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);font-size:14px}
+.lrow:last-child{border-bottom:0}
+.lrow img{width:48px;height:48px;object-fit:contain}
+.lrow .pr{font-weight:800;white-space:nowrap;text-align:right}
+.lrow.done .nm,.lrow.done .pr{text-decoration:line-through;color:var(--muted)}
+.lrow .rm{color:var(--muted)}
+.lrow .sub{font-size:12px;color:var(--muted)}
+.lrow.text{grid-template-columns:24px 1fr auto 28px}
+.lrow .go{color:var(--blue);font-size:13px;font-weight:700}
+.lrow input[type=checkbox]{width:18px;height:18px;accent-color:var(--blue)}
+.lfoot{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+
+/* mobile */
+.bnav{display:none}
+.mtop{display:none}
+@media (max-width:820px){
+  .side{display:none}
+  .main{margin-left:0}
+  .top{padding:10px 14px;gap:10px}
+  .sbox{max-width:none}
+  .tlinks{display:none}
+  .mtop{display:flex;align-items:center;gap:8px;padding:10px 14px 0;background:#fff}
+  .mtop .brand{padding:0;font-size:24px}
+  .mtop .loc{margin:0 0 0 auto;padding:6px 10px;font-size:13px;max-width:60%}
+  .tabs{padding:0 14px;gap:18px;overflow-x:auto}
+  .tabs .right{display:none}
+  .page{padding:16px 16px 90px}
+  .fgrid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .fcard .thumb{height:150px}
+  .cgrid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .clip .cimg{height:120px}
+  .row{grid-auto-columns:150px}
+  .fhead{top:61px;padding:10px 14px}
+  .vgrid{grid-template-columns:1fr}
+  .pick{grid-template-columns:22px 46px 1fr auto 30px;gap:8px;padding:9px 12px}
+  .pick > img,.pick .noimg{width:46px;height:46px}
+  .dlg{grid-template-columns:1fr;padding:22px 18px;max-height:100vh}
+  .ov{padding:0;align-items:flex-end}
+  .dlg .pic img{max-height:200px}
+  .bnav{display:flex;position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);z-index:40;padding:6px 0 max(6px,env(safe-area-inset-bottom))}
+  .bnav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--muted);position:relative}
+  .bnav a.on{color:var(--blue)}
+  .bnav .badge{position:absolute;top:-4px;left:calc(50% + 4px);background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:0 5px;line-height:15px}
+  .fbar input[type=search]{min-width:0;flex:1}
+  .lrow{grid-template-columns:22px 40px 1fr auto 24px;gap:8px;padding:10px 12px}
+  .lrow img{width:40px;height:40px}
+}
+</style>
+</head>
+<body>
+<aside class="side" id="side"></aside>
+<div class="main">
+  <div class="mtop" id="mtop"></div>
+  <header class="top">
+    <label class="sbox" id="sbox">
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search flyers or items" autocomplete="off" enterkeyhint="search">
+      <button type="button" class="clr" id="qclr" aria-label="Clear search"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </label>
+    <div class="tlinks" id="tlinks"></div>
+  </header>
+  <div id="view"></div>
+</div>
+<nav class="bnav" id="bnav"></nav>
+<div id="modal"></div>
+
+<script>const DATA = __DATA__;</script>
+<script>
+(function () {
+  'use strict';
+  // ------------------------------------------------------------ basics
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const mem = {
+    get(k, d) { try { const v = localStorage.getItem('df.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('df.' + k, JSON.stringify(v)); } catch (e) {} }
+  };
+  const ICON = {
+    pin: '<svg class="ic" viewBox="0 0 24 24"><path d="M12 21s-7-6.5-7-12a7 7 0 0114 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>',
+    heart: '<svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7-4.6-9.2-9A5 5 0 0112 5.6 5 5 0 0121.2 11C19 15.4 12 20 12 20z"/></svg>',
+    heartOn: '<svg class="ic fill" viewBox="0 0 24 24"><path d="M12 20s-7-4.6-9.2-9A5 5 0 0112 5.6 5 5 0 0121.2 11C19 15.4 12 20 12 20z"/></svg>',
+    tag: '<svg class="ic" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/></svg>',
+    list: '<svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg>',
+    back: '<svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
+    plus: '<svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+    check: '<svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>',
+    x: '<svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    down: '<svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M6 9l6 6 6-6"/></svg>',
+    search: '<svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+    flyers: '<svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg>',
+    cart: '<svg class="ic" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h11l2-8H6.2"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>',
+    star: '<svg class="ic" viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>'
+  };
+  const norm = s => ' ' + String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim() + ' ';
+  const pad = n => String(n).padStart(2, '0');
+  const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  const toDate = s => { const p = String(s).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); };
+  const NOW = new Date(), TODAY = ymd(NOW), SOON = ymd(new Date(NOW.getTime() + 864e5));
+  const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const fmtDate = s => { if (!s || s > '9000') return ''; const d = toDate(s); return MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); };
+  const daysUntil = s => Math.round((toDate(s) - toDate(TODAY)) / 864e5);
+  function untilText(sd, e) {
+    if (sd && sd > TODAY) return 'Starts ' + DAYS[toDate(sd).getDay()];
+    const d = daysUntil(e);
+    if (d <= 0) return 'Ends today';
+    if (d === 1) return 'Until tomorrow';
+    if (d < 7) return 'Until ' + DAYS[toDate(e).getDay()];
+    const w = Math.round(d / 7);
+    return w + (w === 1 ? ' Week Left' : ' Weeks Left');
+  }
+
+  // ------------------------------------------------------------ data
+  const M = DATA.meta;
+  const FLYERS = DATA.flyers.filter(f => f.e >= TODAY);
+  const ITEMS = DATA.items.filter(x => x.e >= TODAY);
+  const LOGO = {};
+  DATA.flyers.forEach(f => { if (f.lg && !LOGO[f.m]) LOGO[f.m] = f.lg; });
+  ITEMS.forEach(x => {
+    if (!Array.isArray(x.b)) x.b = x.b ? [x.b] : [];
+    if (!Array.isArray(x.ar)) x.ar = x.ar ? [x.ar] : [];
+    if (!Array.isArray(x.hist)) x.hist = x.hist ? [x.hist] : [];
+    if (!Array.isArray(x.cd)) x.cd = x.cd ? [x.cd] : [];
+    x.k = norm(x.n + ' ' + x.m + ' ' + x.b.join(' ') + ' ' + x.d);
+    x.when = x.sd && x.sd > TODAY ? 'upcoming' : (x.e <= SOON ? 'soon' : 'later');
+  });
+  FLYERS.forEach(f => { if (!Array.isArray(f.ar)) f.ar = f.ar ? [f.ar] : []; });
+  const BY_ID = new Map(ITEMS.map(x => [x.id, x]));
+  const FLYER = new Map(FLYERS.map(f => [f.id, f]));
+  const WATCH = DATA.watch.map(w => ({ t: w.t, ids: (Array.isArray(w.ids) ? w.ids : (w.ids ? [w.ids] : [])) }));
+  const VARIETIES = (DATA.varieties || []).map((v, i) => ({ t: v.t, a: v.a, s: v.s || 'Everything else', g: v.g || 'Other', l: !!v.l, i, ids: (Array.isArray(v.ids) ? v.ids : (v.ids ? [v.ids] : [])) }));
+  // Sections and their groups in config order (Meat > Chicken, Beef, Pork ... then Vegetables, Fruits, Everything else).
+  const SECTIONS = [];
+  VARIETIES.forEach(v => {
+    let s = SECTIONS.find(x => x.name === v.s);
+    if (!s) SECTIONS.push(s = { name: v.s, groups: [] });
+    if (!s.groups.includes(v.g)) s.groups.push(v.g);
+  });
+  const WATCH_OF = new Map();
+  WATCH.forEach(w => w.ids.forEach(id => { if (!WATCH_OF.has(id)) WATCH_OF.set(id, w); }));
+  VARIETIES.forEach(v => v.ids.forEach(id => { if (!WATCH_OF.has(id)) WATCH_OF.set(id, v); }));
+
+  // Hidden conditions. mp = membership the price needs; memberships listed in config.json
+  // (myMemberships) count as ones you have.
+  const MINE = (M.myMemberships || []).map(s => String(s).toLowerCase());
+  const needsMembership = x => !!x.mp && !MINE.includes(x.mp.toLowerCase());
+  function condBadges(x) {
+    const b = [];
+    if (x.mp) {
+      const store = x.mp === x.m;
+      if (needsMembership(x)) b.push('<span class="cond mem" title="This price needs a membership">' +
+        esc(store ? x.mp + ' membership needed' : (x.mp === 'Members' ? 'Members only' : x.mp + ' members only')) + '</span>');
+      else b.push('<span class="cond own" title="Needs a membership you have">' + esc(store ? x.mp + ' membership' : x.mp + ' member price') + '</span>');
+    }
+    x.cd.forEach(c => {
+      const [k, n] = String(c).split(':');
+      if (k === 'buy') b.push('<span class="cond buy" title="The price shown is per item when you buy ' + n + '">Must buy ' + n + '</span>');
+      else if (k === 'points') b.push('<span class="cond info" title="Bonus loyalty points; the price itself is not lower">Bonus points offer</span>');
+      else if (k === 'limit') b.push('<span class="cond info">Limit ' + esc(n) + '</span>');
+      else if (k === 'online') b.push('<span class="cond mem" title="This price is for online orders only, not in the store">Online price only</span>');
+    });
+    return b.join('');
+  }
+
+  // Unit price for comparing different package sizes: cw is w (per kg), v (per litre) or c (per piece).
+  const WEIGHED = ['Meat & Poultry', 'Produce', 'Seafood', 'Deli'];
+  function unitLine(x) {
+    if (x.cw === 'w') {
+      if (WEIGHED.includes(x.d)) return x.u === 'lb' && /\/lb$/.test(x.p) ? '' : '$' + (x.cv / 2.20462).toFixed(2) + '/lb';
+      return '$' + (x.cv / 10).toFixed(2) + ' per 100 g';
+    }
+    if (x.cw === 'v') return '$' + x.cv.toFixed(2) + ' per L';
+    if (x.cw === 'c') return '$' + x.cv.toFixed(2) + ' each';
+    return x.ps || '';
+  }
+  // Best value first: compare items that share the most common unit type, then the rest by price.
+  function byValue(list) {
+    const n = {};
+    list.forEach(x => { if (x.cw) n[x.cw] = (n[x.cw] || 0) + 1; });
+    const dom = Object.keys(n).sort((a, b) => n[b] - n[a])[0];
+    const same = list.filter(x => dom && x.cw === dom).sort((a, b) => a.cv - b.cv || (b.s || 0) - (a.s || 0));
+    const rest = list.filter(x => !dom || x.cw !== dom).sort((a, b) => a.v - b.v);
+    return same.concat(rest);
+  }
+  const NONFOOD = ['Health & Beauty', 'Household', 'Home & General', 'Pet', 'Baby', 'Other'];
+
+  // Aisle priority from config.json: meat and produce first, snacks last.
+  const PRI = {};
+  const TIERS = (M.priority || []).length;
+  (M.priority || []).forEach((g, i) => [].concat(g).forEach(d => { PRI[d] = i; }));
+  const tier = x => (x.d in PRI ? PRI[x.d] : TIERS);
+  const tierBonus = x => TIERS > 1 ? 1.5 - 3 * Math.min(tier(x), TIERS - 1) / (TIERS - 1) : 0;
+
+  // ------------------------------------------------------------ user state
+  const S = {
+    area: mem.get('area', M.home),
+    favs: mem.get('favs', []),
+    list: mem.get('list', []),
+    sort: mem.get('sort', {})
+  };
+  const save = () => { mem.set('area', S.area); mem.set('favs', S.favs); mem.set('list', S.list); mem.set('sort', S.sort); };
+  const inArea = x => !S.area || x.ar.includes(S.area);
+  const areaName = () => S.area || 'Windsor-Essex';
+  const isFav = m => S.favs.includes(m);
+  const inList = id => S.list.some(e => e.k === 'i' && e.id === id);
+  const areaItems = () => ITEMS.filter(inArea);
+  const areaFlyers = () => FLYERS.filter(inArea);
+
+  // ------------------------------------------------------------ search
+  function stem(w) {
+    if (w.length > 4 && w.endsWith('ies')) return w.slice(0, -3);
+    if (w.length > 4 && w.endsWith('oes')) return w.slice(0, -2);
+    if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) return w.slice(0, -1);
+    return w;
+  }
+  function parse(q) {
+    const inc = [], exc = [];
+    (String(q).match(/-?"[^"]*"|\S+/g) || []).forEach(tok => {
+      const neg = tok.startsWith('-') && tok.length > 1;
+      if (neg) tok = tok.slice(1);
+      const quoted = /^".*"$/.test(tok);
+      const star = !quoted && /\*$/.test(tok);
+      let t = norm(tok.replace(/["*]/g, '')).trim();
+      if (!t) return;
+      t = ' ' + (quoted ? t + ' ' : (star ? t + '*' : t.split(' ').map(stem).join(' ')));
+      (neg ? exc : inc).push(t);
+    });
+    return { inc, exc };
+  }
+  const bare = t => t.replace(/\*$/, '');
+  // Whole words ("eggs" finds eggs, not eggplant). "chick*" matches word starts; if nothing
+  // matches whole words, word starts are used automatically ("chic" finds chicken).
+  const SUFFIXES = ['', 's', 'es', 'y', 'ies'];
+  const wholeWord = (k, t) => t.endsWith('*') ? k.includes(bare(t)) : t.endsWith(' ') ? k.includes(t) : SUFFIXES.some(s => k.includes(t + s + ' '));
+  function find(q, list, prefixOnly) {
+    const { inc, exc } = parse(q);
+    if (!inc.length && !exc.length) return [];
+    const pool = (list || areaItems()).filter(x => !exc.some(t => x.k.includes(bare(t))));
+    const loose = () => pool.filter(x => inc.every(t => x.k.includes(bare(t))));
+    if (prefixOnly) return loose();
+    const strict = pool.filter(x => inc.every(t => wholeWord(x.k, t)));
+    return strict.length ? strict : loose();
+  }
+  const starred = q => String(q).replace(/(^|\s)(?!-)([^\s"*]+)(?=\s|$)/g, '$1$2*');
+  function relevance(q) {
+    const { inc } = parse(q);
+    const first = inc.length ? inc[0] : '';
+    return x => {
+      const n = norm(x.n);
+      let s = 0;
+      inc.forEach(t => { const i = n.indexOf(bare(t)); if (i >= 0) s += i < 25 ? 3 : 1; if (wholeWord(n, t.replace(/\*$/, ''))) s += 2; });
+      if (first && n.startsWith(bare(first))) s += 2;
+      return s + (x.s || 0) / 100 + tierBonus(x);
+    };
+  }
+  function dedupe(list) {
+    const seen = new Set();
+    return list.filter(x => { const k = x.m + '|' + x.n + '|' + x.p; if (seen.has(k)) return false; seen.add(k); return true; });
+  }
+  function highlight(name, q) {
+    let out = esc(name);
+    if (!q) return out;
+    parse(q).inc.forEach(t => {
+      const words = bare(t).trim().split(' ').map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      if (!words[0]) return;
+      out = out.replace(new RegExp('\\b(' + words.join('[^a-z0-9]+') + ')', 'gi'), '<mark>$1</mark>');
+    });
+    return out;
+  }
+
+  // ------------------------------------------------------------ pieces
+  function logoTab(m) {
+    return '<div class="tab">' + (LOGO[m] ? '<img loading="lazy" src="' + esc(LOGO[m]) + '" alt="' + esc(m) + '">' : '<span>' + esc(m) + '</span>') + '</div>';
+  }
+  function priceHtml(x) {
+    const m = String(x.p).match(/^(.*?)(\/(lb|kg|100g))?$/);
+    return esc(m[1]) + (m[2] ? '<small>' + esc(m[2]) + '</small>' : '') + (x.op ? '<s>' + esc(x.op) + '</s>' : '');
+  }
+  function clip(x, q) {
+    const meta = [];
+    if (x.s) meta.push('<span class="save">SAVE ' + x.s + '%</span>');
+    meta.push('<span class="' + (x.when === 'soon' ? 'soon' : '') + '">' + esc(untilText(x.sd, x.e)) + '</span>');
+    if (x.tc === 'good' && x.tr) meta.push('<span class="trend">' + esc(x.tr) + '</span>');
+    return '<div class="clip" data-item="' + x.id + '">' + logoTab(x.m) +
+      '<button type="button" class="add' + (inList(x.id) ? ' in' : '') + '" data-add="' + x.id + '" title="' + (inList(x.id) ? 'On your list' : 'Add to list') + '">' + (inList(x.id) ? ICON.check : ICON.plus) + '</button>' +
+      '<div class="cimg">' + (x.i ? '<img loading="lazy" src="' + esc(x.i) + '" alt="">' : '') + '</div>' +
+      '<div class="cap"><div class="cp">' + priceHtml(x) + '</div>' +
+      (unitLine(x) ? '<div class="cm">' + esc(unitLine(x)) + '</div>' : '') +
+      '<div class="cn">' + highlight(x.n, q) + '</div>' +
+      (condBadges(x) ? '<div>' + condBadges(x) + '</div>' : '') +
+      '<div class="cm">' + meta.join('') + '</div></div></div>';
+  }
+  function flyerCard(f, extra) {
+    return '<a class="fcard" href="#/flyer/' + f.id + (extra && extra.q ? '/' + encodeURIComponent(extra.q) : '') + '">' +
+      '<div class="thumb">' + (f.th ? '<img loading="lazy" src="' + esc(f.th) + '" alt="">' : '') + '</div>' +
+      '<div class="who">' + (f.lg ? '<img loading="lazy" src="' + esc(f.lg) + '" alt="">' : '') + '<div><div class="nm">' + esc(f.m) + '</div>' +
+      '<div class="sub">' + esc(untilText(f.sd, f.e)) + '</div>' +
+      (extra && extra.n ? '<div class="match">' + extra.n + ' matching item' + (extra.n === 1 ? '' : 's') + '</div>' : '') + '</div></div></a>';
+  }
+  const SORTS = {
+    best: null,
+    top: (a, b) => (tier(a) - tier(b)) || ((b.s || 0) - (a.s || 0)) || a.v - b.v,
+    flyer: (a, b) => (Math.floor(a.x / 1200) - Math.floor(b.x / 1200)) || (b.y - a.y) || (a.x - b.x),
+    price: (a, b) => a.v - b.v,
+    lb: (a, b) => ((a.u === 'lb' ? 0 : 1) - (b.u === 'lb' ? 0 : 1)) || a.v - b.v,
+    deals: (a, b) => ((b.s || 0) - (a.s || 0)) || a.v - b.v,
+    soon: (a, b) => a.e.localeCompare(b.e) || a.v - b.v,
+    store: (a, b) => a.m.localeCompare(b.m) || a.v - b.v
+  };
+  const SORT_LABELS = { value: 'Best value (unit price)', best: 'Best match', top: 'Best deals (meat & produce first)', flyer: 'Flyer order', deals: 'Biggest savings', price: 'Lowest price', lb: 'Price per lb', soon: 'Ending soonest', store: 'Store A-Z' };
+
+  // Shared item grid with Flipp-style store pills, sort and "on sale" toggle.
+  let grid = null;
+  function itemGrid(key, list, opts) {
+    opts = opts || {};
+    const sorts = opts.sorts || ['best', 'top', 'deals', 'price', 'lb', 'soon', 'store'];
+    if (!grid || grid.key !== key) {
+      grid = { key, store: '', dept: '', sale: false, within: '', shown: 60, sort: S.sort[opts.sortKey || 'items'] || sorts[0] };
+      if (!sorts.includes(grid.sort)) grid.sort = sorts[0];
+    }
+    grid.list = list; grid.opts = opts; grid.sorts = sorts;
+    return '<div id="gridbox"></div>';
+  }
+  function drawGrid() {
+    const g = grid, box = $('#gridbox');
+    if (!g || !box) return;
+    let base = g.list;
+    if (g.within) base = find(g.within, base);
+    const counts = {};
+    base.forEach(x => { counts[x.m] = (counts[x.m] || 0) + 1; });
+    const deptCounts = {};
+    base.forEach(x => { if (!g.store || x.m === g.store) deptCounts[x.d] = (deptCounts[x.d] || 0) + 1; });
+    let list = base.filter(x => (!g.store || x.m === g.store) && (!g.dept || x.d === g.dept) && (!g.sale || x.s));
+    const rel = g.opts.q ? relevance(g.opts.q) : null;
+    if (g.sort === 'best' && rel) list = list.map(x => [rel(x), x]).sort((a, b) => b[0] - a[0] || a[1].v - b[1].v).map(p => p[1]);
+    else if (g.sort === 'value') list = byValue(list);
+    else list = list.slice().sort(SORTS[g.sort] || SORTS.top);
+    let h = '<div class="fbar">';
+    if (g.opts.within) h += '<input type="search" id="within" placeholder="Search this flyer" value="' + esc(g.within) + '">';
+    h += '<select id="gsort">' + g.sorts.map(s => '<option value="' + s + '"' + (s === g.sort ? ' selected' : '') + '>Sort: ' + SORT_LABELS[s] + '</option>').join('') + '</select>';
+    if (g.opts.depts) {
+      const ds = Object.keys(deptCounts).sort();
+      h += '<select id="gdept"><option value="">All aisles</option>' + ds.map(d => '<option value="' + esc(d) + '"' + (d === g.dept ? ' selected' : '') + '>' + esc(d) + ' (' + deptCounts[d] + ')</option>').join('') + '</select>';
+    }
+    h += '<button type="button" class="pill' + (g.sale ? ' on' : '') + '" id="gsale">On sale</button>';
+    h += '<span class="muted" style="font-size:13px">' + list.length + ' item' + (list.length === 1 ? '' : 's') + '</span></div>';
+    const stores = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    if (g.opts.stores !== false && stores.length > 1) {
+      h += '<div class="pills"><button type="button" class="pill' + (g.store ? '' : ' on') + '" data-gstore="">All stores <span class="n">' + base.length + '</span></button>' +
+        stores.map(m => '<button type="button" class="pill' + (g.store === m ? ' on' : '') + '" data-gstore="' + esc(m) + '">' + (LOGO[m] ? '<img src="' + esc(LOGO[m]) + '" alt="">' : '') + esc(m) + ' <span class="n">' + counts[m] + '</span></button>').join('') + '</div>';
+    }
+    if (!list.length) h += '<div class="empty"><b>No items found</b>Try a different word, or another store.</div>';
+    else {
+      h += '<div class="cgrid">' + list.slice(0, g.shown).map(x => clip(x, g.opts.q || g.within)).join('') + '</div>';
+      if (list.length > g.shown) h += '<button type="button" class="more" id="gmore">Load more (' + (list.length - g.shown) + ')</button>';
+    }
+    box.innerHTML = h;
+  }
+
+  // ------------------------------------------------------------ chrome (sidebar, top links, mobile nav)
+  function areaSelect() {
+    return '<select id="areaSel" aria-label="Choose area"><option value="">All of Windsor-Essex</option>' +
+      M.areas.map(a => '<option value="' + esc(a) + '"' + (a === S.area ? ' selected' : '') + '>' + esc(a) + '</option>').join('') + '</select>';
+  }
+  function chrome(route) {
+    const fl = areaFlyers();
+    const kinds = {};
+    fl.forEach(f => { kinds[f.k] = (kinds[f.k] || 0) + 1; });
+    const on = (r) => route === r ? ' class="on"' : '';
+    let h = '<a class="brand" href="#/">dealfinder<small>Windsor-Essex flyers</small></a>' +
+      '<div class="loc">' + ICON.pin + '<span class="grow">' + esc(areaName()) + '</span>' + ICON.down + areaSelect() + '</div>' +
+      '<div class="snav">' +
+      '<a href="#/"' + (route.startsWith('picks') ? ' class="on"' : '') + '>' + ICON.star + 'Top Picks</a>' +
+      '<a href="#/favourites"' + on('favourites') + '>' + ICON.heart + 'Favourites</a>' +
+      '<a href="#/flyers/all"' + on('flyers:all') + '>' + ICON.tag + 'Flyers</a>' +
+      '<a href="#/list"' + on('list') + '>' + ICON.list + 'Shopping List' + (S.list.length ? '<span class="cnt">' + S.list.length + '</span>' : '') + '</a></div>' +
+      '<div class="shead">Flyers</div><div class="snav">' +
+      '<a href="#/flyers/all"' + on('flyers:all') + '>All Flyers<span class="cnt">' + fl.length + '</span></a>' +
+      Object.keys(kinds).sort().map(k => '<a href="#/flyers/' + encodeURIComponent(k) + '"' + on('flyers:' + k) + '>' + esc(k) + '<span class="cnt">' + kinds[k] + '</span></a>').join('') +
+      '</div><div class="shead">Top picks</div><div class="snav">' + (() => {
+        const cards = pickCards();
+        return SECTIONS.map(s => {
+          const sc = cards.filter(c => c.v.s === s.name);
+          if (!sc.length) return '';
+          let r = '<a href="' + pickHref(s.name) + '"' + on('picks:' + s.name + ':') + '>' + esc(s.name) + '<span class="cnt">' + sc.length + '</span></a>';
+          if (s.groups.length > 1 && s.name === SECTIONS[0].name) r += s.groups.map(g => {
+            const n = sc.filter(c => c.v.g === g).length;
+            return n ? '<a href="' + pickHref(s.name, g) + '"' + on('picks:' + s.name + ':' + g) + ' style="font-size:14px;padding-left:34px">' + esc(g) + '<span class="cnt">' + n + '</span></a>' : '';
+          }).join('');
+          return r;
+        }).join('');
+      })() +
+      '</div><div class="sfoot">Updated ' + esc(M.updated) + '<br>' + FLYERS.length + ' flyers from ' + new Set(FLYERS.map(f => f.m)).size + ' stores' +
+      (M.failures ? '<br><b>' + M.failures + ' downloads failed</b>' : '') + '<br><br>' + esc(M.notCovered) + '</div>';
+    $('#side').innerHTML = h;
+    $('#mtop').innerHTML = '<a class="brand" href="#/">dealfinder</a><div class="loc">' + ICON.pin + '<span class="grow">' + esc(areaName()) + '</span>' + ICON.down + areaSelect() + '</div>';
+    $('#tlinks').innerHTML = '<label class="tloc">' + ICON.pin + esc(areaName()) + ICON.down + areaSelect() + '</label>' +
+      '<a href="#/list">' + ICON.list + (S.list.length ? '<span class="badge">' + S.list.length + '</span>' : '') + 'Shopping List</a>';
+    const bon = r => route.startsWith(r) ? ' class="on"' : '';
+    $('#bnav').innerHTML = '<a href="#/"' + bon('picks') + '>' + ICON.star + 'Top Picks</a>' +
+      '<a href="#/search/"' + bon('search') + ' id="bsearch">' + ICON.search + 'Search</a>' +
+      '<a href="#/list"' + bon('list') + '>' + ICON.list + (S.list.length ? '<span class="badge">' + S.list.length + '</span>' : '') + 'List</a>' +
+      '<a href="#/flyers/all"' + bon('flyers') + '>' + ICON.flyers + 'Flyers</a>' +
+      '<a href="#/favourites"' + bon('favourites') + '>' + ICON.heart + 'Favourites</a>';
+  }
+
+  // ------------------------------------------------------------ views
+  const V = $('#view');
+  function tabs(items, active, right) {
+    return '<nav class="tabs">' + items.map(([id, label, n, href]) => '<a href="' + href + '"' + (id === active ? ' class="on"' : '') + '>' + esc(label) + (n != null ? '<span class="n">' + n + '</span>' : '') + '</a>').join('') +
+      (right ? '<span class="right">' + esc(right) + '</span>' : '') + '</nav>';
+  }
+
+  function viewFlyers(kind, order) {
+    order = order || 'featured';
+    let fl = areaFlyers().filter(f => kind === 'all' || f.k === kind);
+    if (order === 'latest') fl.sort((a, b) => b.sd.localeCompare(a.sd) || a.m.localeCompare(b.m));
+    else if (order === 'az') fl.sort((a, b) => a.m.localeCompare(b.m));
+    else fl.sort((a, b) => (isFav(b.m) - isFav(a.m)) || ((b.k === 'Groceries') - (a.k === 'Groceries')) || b.c - a.c);
+    const base = '#/flyers/' + encodeURIComponent(kind) + '/';
+    let h = tabs([['featured', 'Featured', null, base + 'featured'], ['latest', 'Latest', null, base + 'latest'], ['az', 'A-Z', null, base + 'az']], order,
+      areaName() + ' ' + (kind === 'all' ? '' : kind + ' ') + 'flyers');
+    h += '<div class="page">';
+    h += fl.length ? '<div class="fgrid">' + fl.map(f => flyerCard(f)).join('') + '</div>' : '<div class="empty"><b>No flyers here</b>Try another area.</div>';
+    h += '</div>';
+    V.innerHTML = h;
+  }
+
+  // ---- Top Picks: the 3 best-value deals for each kind of product, aisle by aisle.
+  function varietyItems(v) { return dedupe(v.ids.map(id => BY_ID.get(id)).filter(x => x && inArea(x))); }
+  function pickRow(x, rank) {
+    const pm = [esc(untilText(x.sd, x.e))];
+    if (x.s) pm.unshift('<span class="save">SAVE ' + x.s + '%</span>');
+    if (x.tc === 'good' && x.tr) pm.push('<span style="color:var(--green);font-weight:700">' + esc(x.tr) + '</span>');
+    const ul = unitLine(x);
+    return '<div class="pick' + (rank === 1 ? ' first' : '') + '" data-item="' + x.id + '">' +
+      '<span class="medal m' + rank + '">' + rank + '</span>' +
+      (x.i ? '<img loading="lazy" src="' + esc(x.i) + '" alt="">' : '<span class="noimg"></span>') +
+      '<div class="pi"><div class="ps">' + (LOGO[x.m] ? '<img loading="lazy" src="' + esc(LOGO[x.m]) + '" alt="">' : '') + esc(x.m) + '</div>' +
+      '<div class="pn">' + esc(x.n) + '</div>' + (condBadges(x) ? '<div>' + condBadges(x) + '</div>' : '') +
+      '<div class="pm">' + pm.join(' &middot; ') + '</div></div>' +
+      '<div class="pp"><div class="big">' + priceHtml(x) + '</div>' + (ul ? '<div class="ul">' + esc(ul) + '</div>' : '') + '</div>' +
+      '<button type="button" class="add' + (inList(x.id) ? ' in' : '') + '" data-add="' + x.id + '" title="Add to list">' + (inList(x.id) ? ICON.check : ICON.plus) + '</button></div>';
+  }
+  // Household-size packages first: a $145 case of wings only shows when nothing smaller is on sale.
+  // Deals that need a membership you don't have are never picked.
+  function pickTop(list) {
+    const cap = M.maxPickPrice || 35;
+    list = list.filter(x => !needsMembership(x) && !x.cd.includes('online'));
+    const normal = list.filter(x => !(x.tp > cap)), bulk = list.filter(x => x.tp > cap);
+    return byValue(normal).concat(byValue(bulk)).slice(0, 3);
+  }
+  // Every variety with deals in the current area, with its top 3.
+  function pickCards() {
+    const cards = [];
+    VARIETIES.forEach(v => {
+      const list = varietyItems(v);
+      const top = pickTop(list);
+      if (top.length) cards.push({ v, list, top, stores: new Set(list.map(x => x.m)).size });
+    });
+    return cards;
+  }
+  const pickHref = (s, g) => '#/picks/' + encodeURIComponent(s) + (g ? '/' + encodeURIComponent(g) : '');
+  function varietyCard(c) {
+    return '<div class="vcard"><div class="vh"><a class="vt" href="#/variety/' + encodeURIComponent(c.v.t) + '">' + esc(c.v.t) + '</a>' +
+      (c.v.l ? '<span class="star" title="On your watchlist">&#9733;</span>' : '') +
+      '<span class="vn">' + c.list.length + ' deal' + (c.list.length === 1 ? '' : 's') + ' &middot; ' + c.stores + ' store' + (c.stores === 1 ? '' : 's') + '</span></div>' +
+      c.top.map((x, i) => pickRow(x, i + 1)).join('') +
+      (c.list.length > 3 ? '<a class="vall" href="#/variety/' + encodeURIComponent(c.v.t) + '">See all ' + c.list.length + ' ' + esc(c.v.t) + ' deals &rsaquo;</a>' : '') + '</div>';
+  }
+  function viewPicks(sel, sub) {
+    sel = sel || ''; sub = sub || '';
+    const cards = pickCards();
+    const listCount = cards.filter(c => c.v.l).length;
+    const inSec = s => cards.filter(c => c.v.s === s);
+    let h = '<div class="page"><div class="phead"><h1>Top picks near ' + esc(areaName()) + '</h1>' +
+      '<p>The 3 best-value deals for ' + cards.length + ' kinds of products, so you don\'t have to read the flyers. Ranked by unit price (per lb, kg, litre or piece) so different sizes compare fairly. ' +
+      (MINE.length ? 'Member prices for your memberships (' + esc(M.myMemberships.join(', ')) + ') are included and marked in blue; any other membership deals and online-only prices are left out.'
+        : 'Prices that need a membership (PC Optimum, Scene+ or moi member prices, and Costco) are left out.') + ' Other conditions like "Must buy 2" are labelled.</p></div>';
+    if (M.historyWeeks < 4) h += '<div class="note"><b>Building price history.</b> After a few weekly runs, picks also show badges like "Lowest in 6 wks".</div>';
+    h += '<div class="pills"><a class="pill' + (!sel ? ' on' : '') + '" href="#/">All <span class="n">' + cards.length + '</span></a>' +
+      SECTIONS.filter(s => inSec(s.name).length).map(s => '<a class="pill' + (sel === s.name ? ' on' : '') + '" href="' + pickHref(s.name) + '">' + esc(s.name) + ' <span class="n">' + inSec(s.name).length + '</span></a>').join('') +
+      (listCount ? '<a class="pill' + (sel === 'mylist' ? ' on' : '') + '" href="#/picks/mylist">&#9733; My list <span class="n">' + listCount + '</span></a>' : '') + '</div>';
+    const cur = SECTIONS.find(s => s.name === sel);
+    if (cur && cur.groups.length > 1) {
+      const gc = g => inSec(cur.name).filter(c => c.v.g === g).length;
+      h += '<div class="pills"><a class="pill' + (!sub ? ' on' : '') + '" href="' + pickHref(cur.name) + '">All ' + esc(cur.name.toLowerCase()) + '</a>' +
+        cur.groups.filter(g => gc(g)).map(g => '<a class="pill' + (sub === g ? ' on' : '') + '" href="' + pickHref(cur.name, g) + '">' + esc(g) + ' <span class="n">' + gc(g) + '</span></a>').join('') + '</div>';
+    }
+    SECTIONS.forEach(s => {
+      if (sel && sel !== 'mylist' && sel !== s.name) return;
+      let sc = inSec(s.name);
+      if (sel === 'mylist') sc = sc.filter(c => c.v.l);
+      if (!sc.length) return;
+      h += '<section class="sect"><h2 class="sec"><a href="' + pickHref(s.name) + '">' + esc(s.name) + '</a><span class="n">' + sc.length + '</span></h2>';
+      s.groups.forEach(g => {
+        if (sub && sub !== g) return;
+        const gcards = sc.filter(c => c.v.g === g).sort((p, q) => (q.v.l - p.v.l) || (p.v.i - q.v.i));
+        if (!gcards.length) return;
+        if (s.groups.length > 1) h += '<div class="h"><a href="' + pickHref(s.name, g) + '">' + esc(g) + '</a></div>';
+        h += '<div class="vgrid">' + gcards.map(varietyCard).join('') + '</div>';
+      });
+      h += '</section>';
+    });
+    if (!cards.length) h += '<div class="empty"><b>No picks near ' + esc(areaName()) + '</b>Try switching the area to All of Windsor-Essex.</div>';
+    V.innerHTML = h + '</div>';
+  }
+  function viewVariety(term) {
+    const v = VARIETIES.find(x => x.t === term);
+    if (!v) { go('#/search/' + encodeURIComponent(term), true); return; }
+    V.innerHTML = '<div class="page"><a href="' + pickHref(v.s, v.g) + '" style="color:var(--blue);font-size:14px">&lsaquo; ' + esc(v.g === v.s ? v.s : v.s + ': ' + v.g) + ' picks</a>' +
+      '<div class="h" style="margin-top:10px">' + esc(term) + ' - ' + esc(areaName()) + '</div>' +
+      itemGrid('variety:' + term, varietyItems(v), { sorts: ['value', 'price', 'deals', 'soon', 'store'], sortKey: 'variety' }) + '</div>';
+    drawGrid();
+  }
+
+  function viewFlyer(id, q) {
+    const f = FLYER.get(id);
+    if (!f) { V.innerHTML = '<div class="page"><div class="empty"><b>This flyer has ended</b><a href="#/" style="color:var(--blue)">See current flyers</a></div></div>'; return; }
+    const items = ITEMS.filter(x => x.f === id);
+    V.innerHTML = '<div class="fhead"><button type="button" class="backbtn" data-back aria-label="Back">' + ICON.back + '</button>' +
+      (f.lg ? '<img src="' + esc(f.lg) + '" alt="">' : '') + '<span class="nm">' + esc(f.m) + '</span>' +
+      '<span class="dt">Valid ' + esc(fmtDate(f.sd).replace(/, \d{4}$/, '')) + ' - ' + esc(fmtDate(f.e)) + '</span>' +
+      '<button type="button" class="heart' + (isFav(f.m) ? ' on' : '') + '" data-fav="' + esc(f.m) + '" title="Favourite">' + (isFav(f.m) ? ICON.heartOn : ICON.heart) + '</button></div>' +
+      '<div class="page">' + itemGrid('flyer:' + id, items, { within: true, stores: false, depts: true, sorts: ['flyer', 'top', 'deals', 'price', 'lb'], sortKey: 'flyer' }) + '</div>';
+    if (q) grid.within = q;
+    drawGrid();
+  }
+
+  function viewSearch(q, tab) {
+    tab = tab || 'all';
+    const hits = dedupe(find(q));
+    const byStore = {};
+    hits.forEach(x => { byStore[x.f] = (byStore[x.f] || 0) + 1; });
+    const fl = Object.keys(byStore).map(id => FLYER.get(id)).filter(Boolean).sort((a, b) => byStore[b.id] - byStore[a.id]);
+    const base = '#/search/' + encodeURIComponent(q) + '/';
+    let h = tabs([['all', 'All', hits.length + fl.length, base + 'all'], ['items', 'Items', hits.length, base + 'items'], ['flyers', 'Flyers', fl.length, base + 'flyers']], tab);
+    h += '<div class="page">';
+    if (!q.trim()) {
+      h += '<div class="h">Popular searches</div><div class="pills" style="flex-wrap:wrap">' + WATCH.map(w => '<a class="pill" href="#/search/' + encodeURIComponent(w.t) + '">' + esc(w.t) + '</a>').join('') + '</div>' +
+        '<p class="muted" style="font-size:13.5px">Tips: put a phrase in quotes ("greek yogurt") and use a minus to leave words out (cheese -cream).</p></div>';
+      V.innerHTML = h; return;
+    }
+    const title = q.trim().replace(/\*/g, '').toUpperCase() + ' - ' + areaName().toUpperCase();
+    const wider = starred(q);
+    if (wider !== q && hits.length) {
+      const extra = dedupe(find(wider, null, true)).length - hits.length;
+      if (extra > 0) h += '<div class="pills"><a class="pill" href="#/search/' + encodeURIComponent(wider) + '/' + tab + '">+' + extra + ' more starting with "' + esc(q.trim()) + '"</a></div>';
+    }
+    if (tab !== 'flyers') {
+      h += '<div class="h">' + esc(title) + ' - ITEMS</div>' + itemGrid('search:' + q, hits, { q, depts: true }) ;
+    }
+    if (tab !== 'items' && fl.length) {
+      h += '<div class="h mt">' + esc(title) + ' - FLYERS</div><div class="fgrid">' + fl.map(f => flyerCard(f, { n: byStore[f.id], q })).join('') + '</div>';
+    }
+    if (!hits.length) h += '<div class="empty"><b>No deals for "' + esc(q) + '" near ' + esc(areaName()) + '</b>Check the spelling, try a shorter word, or switch the area to All of Windsor-Essex.</div>';
+    h += '</div>';
+    V.innerHTML = h;
+    drawGrid();
+  }
+
+  function viewAisle(dept) {
+    const list = dedupe(areaItems().filter(x => x.d === dept));
+    V.innerHTML = '<div class="page"><div class="h">' + esc(dept) + ' - ' + esc(areaName()) + '</div>' +
+      itemGrid('aisle:' + dept, list, { sorts: ['deals', 'price', 'lb', 'soon', 'store'], sortKey: 'aisle' }) + '</div>';
+    drawGrid();
+  }
+
+  function viewFavourites() {
+    const fl = areaFlyers().filter(f => isFav(f.m)).sort((a, b) => a.m.localeCompare(b.m));
+    let h = '<div class="page"><div class="h">Favourites</div>';
+    if (!S.favs.length) h += '<div class="empty"><b>No favourite stores yet</b>Open a flyer and tap the heart to keep it here.</div>';
+    else if (!fl.length) h += '<div class="empty"><b>Your favourite stores have no flyers in ' + esc(areaName()) + '</b>Try another area.</div>';
+    else {
+      h += '<div class="fgrid">' + fl.map(f => flyerCard(f)).join('') + '</div>';
+      const fav = dedupe(areaItems().filter(x => isFav(x.m) && x.s && !NONFOOD.includes(x.d))).sort(SORTS.top).slice(0, 30);
+      if (fav.length) h += '<div class="h mt">Best savings at your favourites</div><div class="row">' + fav.map(x => clip(x)).join('') + '</div>';
+    }
+    V.innerHTML = h + '</div>';
+  }
+
+  function viewList() {
+    const texts = S.list.filter(e => e.k === 't');
+    const items = S.list.filter(e => e.k === 'i');
+    let h = '<div class="page"><div class="lwrap"><div class="h">Shopping List</div>' +
+      '<form class="ladd" id="laddf"><input id="ladd" placeholder="Add an item, e.g. milk" autocomplete="off"><button class="btn solid" type="submit">Add</button></form>';
+    if (!S.list.length) h += '<div class="empty"><b>Your list is empty</b>Type what you need above, or tap + on any deal to clip it here.</div>';
+    if (texts.length) {
+      h += '<div class="lcard"><div class="lh">Things to buy</div>' + texts.map(e => {
+        const w = WATCH.find(x => x.t.toLowerCase() === e.text.toLowerCase());
+        const hits = w ? dedupe(w.ids.map(id => BY_ID.get(id)).filter(x => x && inArea(x))) : find(e.text);
+        const best = w ? hits[0] : hits.slice().sort((a, b) => a.v - b.v)[0];
+        return '<div class="lrow text' + (e.done ? ' done' : '') + '"><input type="checkbox" data-done="' + esc(e.uid) + '"' + (e.done ? ' checked' : '') + '>' +
+          '<div><div class="nm" style="text-transform:capitalize">' + esc(e.text) + '</div><div class="sub">' +
+          (hits.length ? hits.length + ' deal' + (hits.length === 1 ? '' : 's') + ' &middot; from ' + esc(best.p) + ' at ' + esc(best.m) : 'No deals this week') + '</div></div>' +
+          (hits.length ? '<a class="go" href="#/search/' + encodeURIComponent(e.text) + '">See deals</a>' : '<span></span>') +
+          '<button type="button" class="rm" data-rm="' + esc(e.uid) + '" aria-label="Remove">' + ICON.x + '</button></div>';
+      }).join('') + '</div>';
+    }
+    const groups = {};
+    items.forEach(e => { (groups[e.m] = groups[e.m] || []).push(e); });
+    let grand = 0;
+    Object.keys(groups).sort().forEach(m => {
+      let tot = 0;
+      const rows = groups[m].map(e => {
+        const live = BY_ID.get(e.id);
+        if (live && !e.done) tot += live.v && live.u !== 'lb' ? live.v : 0;
+        return '<div class="lrow' + (e.done ? ' done' : '') + '"><input type="checkbox" data-done="' + esc(e.uid) + '"' + (e.done ? ' checked' : '') + '>' +
+          (e.i ? '<img loading="lazy" src="' + esc(e.i) + '" alt="">' : '<span></span>') +
+          '<div><div class="nm"' + (live ? ' data-item="' + e.id + '" style="cursor:pointer"' : '') + '>' + esc(e.n) + '</div><div class="sub">' + (live ? esc(untilText(live.sd, live.e)) : 'This deal has ended') + '</div></div>' +
+          '<div class="pr">' + esc(e.p) + '</div><button type="button" class="rm" data-rm="' + esc(e.uid) + '" aria-label="Remove">' + ICON.x + '</button></div>';
+      }).join('');
+      grand += tot;
+      h += '<div class="lcard"><div class="lh">' + (LOGO[m] ? '<img src="' + esc(LOGO[m]) + '" alt="">' : '') + esc(m) +
+        '<span class="tot">' + (tot ? '$' + tot.toFixed(2) : '') + '</span></div>' + rows + '</div>';
+    });
+    if (S.list.length) h += '<div class="lfoot"><button type="button" class="btn" id="lclear">Remove checked items</button>' +
+      (grand ? '<b>Estimated total: $' + grand.toFixed(2) + '</b>' : '') + '</div>' +
+      '<p class="muted" style="font-size:12.5px">Totals count one of each per-item deal; items sold by weight are left out.</p>';
+    V.innerHTML = h + '</div></div>';
+  }
+
+  // ------------------------------------------------------------ item pop-up
+  const STOP = new Set('fresh value pack family product selected varieties assorted original compliments irresistible selection great club size each ontario canada grade large small medium premium natural style with from only save the and for or of in our new no name pc'.split(' '));
+  function similar(x) {
+    const w = WATCH_OF.get(x.id);
+    let pool;
+    if (w) pool = w.ids.map(id => BY_ID.get(id)).filter(Boolean);
+    else {
+      const words = norm(x.n).trim().split(' ').filter(t => t.length > 3 && !STOP.has(t) && !/\d/.test(t)).slice(0, 2);
+      if (!words.length) return [];
+      pool = areaItems().filter(y => words.every(t => y.k.includes(' ' + stem(t))) && y.d === x.d);
+    }
+    return dedupe(pool.filter(y => y.m !== x.m && inArea(y))).sort((a, b) => ((a.u === x.u) ? 0 : 1) - ((b.u === x.u) ? 0 : 1) || a.v - b.v).slice(0, 6);
+  }
+  function sparkline(hist, now) {
+    const pts = hist.concat([{ w: TODAY, v: now }]);
+    const vs = pts.map(p => p.v), lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs);
+    const W = 300, H = 60, n = pts.length;
+    const xy = pts.map((p, i) => [n === 1 ? W / 2 : 8 + i * (W - 16) / (n - 1), hi === lo ? H / 2 : 8 + (H - 16) * (1 - (p.v - lo) / (hi - lo))]);
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:60px"><polyline fill="none" stroke="#076ae2" stroke-width="2" points="' + xy.map(p => p.join(',')).join(' ') + '"/>' +
+      xy.map((p, i) => '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (i === n - 1 ? 4 : 2.5) + '" fill="' + (i === n - 1 ? '#d93025' : '#076ae2') + '"/>').join('') + '</svg>' +
+      '<div class="muted" style="font-size:12px;display:flex;justify-content:space-between"><span>Low $' + lo.toFixed(2) + '</span><span>' + pts.length + ' weeks</span><span>High $' + hi.toFixed(2) + '</span></div>';
+  }
+  function openItem(id) {
+    const x = BY_ID.get(id);
+    if (!x) return;
+    const unitM = String(x.p).match(/^(.*?)(\/(lb|kg|100g))?$/);
+    const desc = [];
+    if (unitLine(x)) desc.push('Works out to ' + esc(unitLine(x)));
+    if (x.op) desc.push('Regular price ' + esc(x.op));
+    if (x.b.length) desc.push('Brand: ' + esc(x.b.join(', ')));
+    desc.push('Aisle: <a href="#/aisle/' + encodeURIComponent(x.d) + '" style="color:var(--blue)">' + esc(x.d) + '</a>');
+    desc.push('Flyer reaches: ' + esc(x.ar.join(', ')));
+    const sims = similar(x);
+    const cheaper = sims.filter(y => y.u === x.u && y.v < x.v).length;
+    let h = '<div class="ov" id="ov"><div class="dlg" role="dialog" aria-modal="true">' +
+      '<button type="button" class="x" id="mclose" aria-label="Close">' + ICON.x + '</button>' +
+      '<div class="pic">' + (x.i ? '<img src="' + esc(x.i) + '" alt="">' : '') + '</div><div>' +
+      (LOGO[x.m] ? '<img class="lg" src="' + esc(LOGO[x.m]) + '" alt="' + esc(x.m) + '">' : '<div class="lgt">' + esc(x.m) + '</div>') +
+      '<h2>' + esc(x.n) + '</h2>' +
+      '<div class="bp">' + esc(unitM[1]) + (unitM[2] ? '<small>' + esc(unitM[2].slice(1).toUpperCase()) + '</small>' : '') + (x.op ? '<s>' + esc(x.op) + '</s>' : '') + '</div>' +
+      '<div class="acts"><button type="button" class="btn' + (inList(x.id) ? ' solid' : '') + '" data-add="' + x.id + '">' + (inList(x.id) ? ICON.check + 'On your list' : ICON.plus + 'Add to List') + '</button>' +
+      '<a class="btn solid" href="#/flyer/' + x.f + '">View Flyer</a></div>' +
+      (condBadges(x) ? '<div style="margin-bottom:8px">' + condBadges(x) + '</div>' : '') +
+      (x.st ? '<div class="story">' + esc(x.st) + '</div>' : '') +
+      '<div class="valid">Valid ' + esc(fmtDate(x.sd)) + ' - ' + esc(fmtDate(x.e)) + '</div>' +
+      '<div class="lbl">Description</div><div class="desc">' + desc.join('<br>') + '</div>' +
+      '<div class="lbl">Price history</div>' +
+      (x.hist.length ? '<div class="trendbox' + (x.tc === 'good' ? ' good' : '') + '">' + (x.tr ? esc(x.tr) : 'Usual price') + '</div>' + sparkline(x.hist, x.v)
+        : '<div class="trendbox">Tracking started ' + esc(fmtDate(M.trackingSince)) + '. This item\'s price history will show here once it appears in a few more weekly flyers.</div>') +
+      '<div class="lbl">Compare at other stores' + (cheaper ? ' <span style="color:var(--red);text-transform:none">&middot; ' + cheaper + ' cheaper</span>' : '') + '</div>' +
+      (sims.length ? '<div class="cmp">' + sims.map((y, i) => '<a data-item="' + y.id + '">' + (LOGO[y.m] ? '<img src="' + esc(LOGO[y.m]) + '" alt="">' : '<span></span>') +
+        '<div><div class="cn">' + esc(y.n) + '</div><div class="cs">' + esc(y.m) + ' &middot; ' + esc(untilText(y.sd, y.e)) + '</div></div>' +
+        '<div class="pr">' + esc(y.p) + (y.u === x.u && y.v < x.v && i === 0 ? '<div class="best">CHEAPER</div>' : '') + '</div></a>').join('') + '</div>'
+        : '<div class="muted" style="font-size:13.5px">No similar items in other flyers this week.</div>') +
+      '<div class="disc">In the event of disagreement between the flyer and this page, the flyer shall take precedence.</div>' +
+      '</div></div></div>';
+    $('#modal').innerHTML = h;
+    document.body.style.overflow = 'hidden';
+  }
+  function closeItem() { $('#modal').innerHTML = ''; document.body.style.overflow = ''; }
+
+  // ------------------------------------------------------------ list actions
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  function toggleList(id) {
+    const i = S.list.findIndex(e => e.k === 'i' && e.id === id);
+    if (i >= 0) S.list.splice(i, 1);
+    else { const x = BY_ID.get(id); if (!x) return; S.list.push({ k: 'i', uid: uid(), id: x.id, m: x.m, n: x.n, p: x.p, i: x.i, done: false }); }
+    save();
+  }
+
+  // ------------------------------------------------------------ router
+  // Routes live in memory (ROUTE) so the app also works where the page's URL can't change,
+  // like a shared link; the address bar follows along where the browser allows it.
+  let lastRoute = '', lastKey = 'picks:';
+  let ROUTE = /^#\//.test(location.hash) ? location.hash : '#/';
+  const trail = [ROUTE];
+  function go(h, replace) {
+    ROUTE = h;
+    if (replace) trail[trail.length - 1] = h; else trail.push(h);
+    try { history[replace ? 'replaceState' : 'pushState'](null, '', h); } catch (e) { /* not allowed here; the in-memory route still works */ }
+    closeItem();
+    render();
+  }
+  function goBack() {
+    if (trail.length > 1) { trail.pop(); ROUTE = trail[trail.length - 1]; try { history.replaceState(null, '', ROUTE); } catch (e) { } closeItem(); render(); }
+    else go('#/');
+  }
+  function render() {
+    const parts = ROUTE.replace(/^#\/?/, '').split('/').map(s => { try { return decodeURIComponent(s); } catch (e) { return s; } });
+    const v = parts[0] || '';
+    let key;
+    if (v === 'flyer') { key = 'flyer'; viewFlyer(parts[1], parts[2]); }
+    else if (v === 'search') { key = 'search'; $('#q').value = parts[1] || ''; viewSearch(parts[1] || '', parts[2]); }
+    else if (v === 'aisle') { key = 'aisle:' + parts[1]; viewAisle(parts[1]); }
+    else if (v === 'list') { key = 'list'; viewList(); }
+    else if (v === 'favourites') { key = 'favourites'; viewFavourites(); }
+    else if (v === 'flyers') { const kind = parts[1] || 'all'; key = 'flyers:' + kind; viewFlyers(kind, parts[2]); }
+    else if (v === 'variety') { key = 'variety'; viewVariety(parts[1] || ''); }
+    else { key = 'picks:' + (v === 'picks' ? (parts[1] || '') + ':' + (parts[2] || '') : ':'); viewPicks(v === 'picks' ? parts[1] : '', v === 'picks' ? parts[2] : ''); }
+    if (v !== 'search') $('#q').value = '';
+    $('#sbox').classList.toggle('has', !!$('#q').value);
+    chrome(key);
+    lastKey = key;
+    const path = parts.slice(0, 2).join('/');
+    if (path !== lastRoute) window.scrollTo(0, 0);
+    lastRoute = path;
+  }
+  function refresh() { render(); }
+
+  // ------------------------------------------------------------ events
+  let qt;
+  $('#q').addEventListener('input', () => {
+    $('#sbox').classList.toggle('has', !!$('#q').value);
+    clearTimeout(qt);
+    qt = setTimeout(() => {
+      const q = $('#q').value;
+      const target = '#/search/' + encodeURIComponent(q);
+      if (ROUTE.startsWith('#/search/')) { ROUTE = target; trail[trail.length - 1] = target; try { history.replaceState(null, '', target); } catch (e) { } render(); }
+      else if (q.trim()) go(target);
+    }, 300);
+  });
+  $('#q').addEventListener('keydown', e => { if (e.key === 'Enter') { clearTimeout(qt); go('#/search/' + encodeURIComponent($('#q').value), ROUTE.startsWith('#/search/')); $('#q').blur(); } });
+  $('#qclr').addEventListener('click', e => { e.preventDefault(); $('#q').value = ''; $('#q').focus(); if (ROUTE.startsWith('#/search/')) go('#/search/', true); });
+
+  document.addEventListener('change', e => {
+    const t = e.target;
+    if (t.id === 'areaSel') { S.area = t.value; save(); grid = null; return render(); }
+    if (t.id === 'gsort') { grid.sort = t.value; S.sort[grid.opts.sortKey || 'items'] = t.value; save(); grid.shown = 60; return drawGrid(); }
+    if (t.id === 'gdept') { grid.dept = t.value; grid.shown = 60; return drawGrid(); }
+    if (t.dataset.done) { const en = S.list.find(x => x.uid === t.dataset.done); if (en) { en.done = t.checked; save(); viewList(); chrome('list'); } }
+  });
+  document.addEventListener('input', e => {
+    if (e.target.id === 'within') {
+      clearTimeout(qt);
+      qt = setTimeout(() => { grid.within = e.target.value; grid.shown = 60; drawGrid(); const w = $('#within'); if (w) { w.focus(); w.setSelectionRange(w.value.length, w.value.length); } }, 250);
+    }
+  });
+  document.addEventListener('submit', e => {
+    if (e.target.id === 'laddf') {
+      e.preventDefault();
+      const v = $('#ladd').value.trim();
+      if (v) { S.list.unshift({ k: 't', uid: uid(), text: v, done: false }); save(); }
+      viewList(); chrome('list'); $('#ladd').focus();
+    }
+  });
+  document.addEventListener('click', e => {
+    const t = e.target;
+    const add = t.closest('[data-add]');
+    if (add) {
+      e.preventDefault(); e.stopPropagation();
+      toggleList(add.dataset.add);
+      if ($('#ov')) openItem(add.dataset.add);
+      document.querySelectorAll('[data-add="' + add.dataset.add + '"]').forEach(b => {
+        if (b.classList.contains('add')) { const on = inList(b.dataset.add); b.classList.toggle('in', on); b.innerHTML = on ? ICON.check : ICON.plus; }
+      });
+      chrome(lastKey);
+      return;
+    }
+    if (t.id === 'ov' || t.closest('#mclose')) return closeItem();
+    const item = t.closest('[data-item]');
+    if (item) { e.preventDefault(); return openItem(item.dataset.item); }
+    if (t.closest('[data-back]')) return goBack();
+    const link = t.closest('a[href^="#/"]');
+    if (link) {
+      e.preventDefault();
+      go(link.getAttribute('href'));
+      if (link.id === 'bsearch') setTimeout(() => $('#q').focus(), 50);
+      return;
+    }
+    const fav = t.closest('[data-fav]');
+    if (fav) {
+      const m = fav.dataset.fav;
+      S.favs = isFav(m) ? S.favs.filter(x => x !== m) : S.favs.concat(m); save();
+      fav.classList.toggle('on', isFav(m)); fav.innerHTML = isFav(m) ? ICON.heartOn : ICON.heart;
+      return;
+    }
+    const gs = t.closest('[data-gstore]');
+    if (gs) { grid.store = gs.dataset.gstore; grid.shown = 60; return drawGrid(); }
+    if (t.id === 'gsale') { grid.sale = !grid.sale; grid.shown = 60; return drawGrid(); }
+    if (t.id === 'gmore') { grid.shown += 60; return drawGrid(); }
+    const rm = t.closest('[data-rm]');
+    if (rm) { S.list = S.list.filter(x => x.uid !== rm.dataset.rm); save(); viewList(); return chrome('list'); }
+    if (t.id === 'lclear') { S.list = S.list.filter(x => !x.done); save(); viewList(); return chrome('list'); }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#ov')) closeItem(); });
+  // Browser back/forward where the address bar is ours (opening the file locally).
+  window.addEventListener('popstate', () => { ROUTE = /^#\//.test(location.hash) ? location.hash : '#/'; trail.push(ROUTE); closeItem(); render(); });
+  render();
+})();
+</script>
+</body>
+</html>

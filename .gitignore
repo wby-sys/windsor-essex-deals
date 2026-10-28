@@ -1,0 +1,9 @@
+# Rebuilt every run, or only useful on this PC
+latest-deals.html
+reports/
+share/
+data/last-fetch.clixml
+data/item-details.clixml
+data/thumbs/
+data/run.log
+_site/
