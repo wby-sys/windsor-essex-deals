@@ -753,7 +753,10 @@ function Get-Stores {
 }
 
 $StoresPath = Join-Path $DataDir 'stores.json'
-if (-not $ReportOnly -or -not (Test-Path $StoresPath)) {
+# Overpass servers time out from GitHub's cloud computers, and stores rarely move, so cloud runs
+# use the saved list; a run on a home PC refreshes it.
+$cloud = $env:GITHUB_ACTIONS -eq 'true'
+if (-not (Test-Path $StoresPath) -or (-not $ReportOnly -and -not $cloud)) {
   $found = Get-Stores
   if ($found) {
     ($found | ConvertTo-Json -Compress -Depth 3) | Set-Content -Path $StoresPath -Encoding UTF8
