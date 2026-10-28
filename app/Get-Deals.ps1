@@ -723,11 +723,16 @@ function Get-Stores {
     "nwr[`"shop`"][`"name`"~`"$rx`",i]$around;nwr[`"shop`"][`"brand`"~`"$rx`",i]$around;nwr[`"amenity`"=`"pharmacy`"][`"name`"~`"$rx`",i]$around;);out center tags;"
   $body = Join-Path $env:TEMP 'deals-overpass.txt'
   [IO.File]::WriteAllText($body, 'data=' + [uri]::EscapeDataString($query))
-  foreach ($server in 'https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter') {
-    $raw = & curl.exe -s --max-time 150 -A 'WindsorEssexDealFinder/1.0' --data "@$body" $server
+  $j = $null
+  foreach ($server in 'https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.kumi.systems/api/interpreter') {
+    $raw = & curl.exe -s --max-time 75 -A 'WindsorEssexDealFinder/1.0' --data "@$body" $server
+    $code = $LASTEXITCODE
     try { $j = ($raw -join "`n") | ConvertFrom-Json } catch { $j = $null }
     if ($j -and $j.elements) { break }
+    Write-Log "  store lookup via $server failed (curl exit $code)"
   }
+  # A failed curl leaves a non-zero exit code behind, which GitHub Actions would report as a failed run.
+  $global:LASTEXITCODE = 0
   if (-not $j -or -not $j.elements) { return $null }
   $seen = @{}
   $out = foreach ($e in $j.elements) {
