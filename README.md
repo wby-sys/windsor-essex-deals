@@ -9,7 +9,7 @@ It updates by itself every Thursday and Saturday around 8–9 AM Windsor time, e
 To change settings (watchlist, products, memberships), edit `config.json` on GitHub, or locally and then `git pull` and `git push`. The next run uses the new settings.
 
 - **latest-deals.html**: open this. It opens on **Top Picks**: the 3 best-value deals for each kind of product, aisle by aisle, with meat and produce first. Flyers, search, favourites and a shopping list are there too.
-- **share/windsor-essex-deals.html**: a copy you can share. It's built by `app\Build-Share.ps1` from latest-deals.html, with small copies of the pictures built in (hosted pages can't load pictures from other websites). It's published at https://claude.ai/artifact/B25cQ7XWsA44m3FwPXtxg9 and doesn't update by itself: rebuild it and ask Claude to republish it after new flyers come out.
+- **share/windsor-essex-deals.html**: an older shareable copy, published on claude.ai (it needs a login and doesn't update). The GitHub Pages link above replaces it. It's built by `app\Build-Share.ps1` if you ever need it again.
 - **run-now.cmd**: double-click to refresh now and open the app.
 - **config.json**: your settings.
   - `watchlist`: products you buy often. They're starred under "My list".
@@ -25,7 +25,7 @@ To change settings (watchlist, products, memberships), edit `config.json` on Git
 - **app/Get-Deals.ps1**: downloads the flyers and builds the report.
 - **app/template.html**: the app's look and behaviour. The script fills in the data.
 
-The app runs automatically every Thursday and Saturday at 8 AM through Windows Task Scheduler (task name "Windsor-Essex Grocery Deals"). If the PC is off at that time, it runs the next time the PC is on.
+The automatic Thursday/Saturday updates now happen on GitHub (see the top of this file). The old Windows Task Scheduler task "Windsor-Essex Grocery Deals" is disabled; you can re-enable it in Task Scheduler if you ever want local runs again. Before pushing changes after a local run, do `git pull` so GitHub's saved price history merges with yours.
 
 Your favourites, shopping list and chosen area are saved in the browser you open the app in.
 
