@@ -39,12 +39,12 @@ jobs:
         shell: powershell
         run: ./app/Get-Deals.ps1
 
-      - name: Save price history
+      - name: Save price history and store locations
         shell: powershell
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/history.csv
+          git add data/history.csv data/stores.json
           git diff --cached --quiet
           if ($LASTEXITCODE -ne 0) {
             git commit -m "Price history $(Get-Date -Format yyyy-MM-dd)"

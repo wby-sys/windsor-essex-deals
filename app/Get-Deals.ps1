@@ -700,6 +700,65 @@ Write-Log "Matched $($varietyData.Count) product varieties"
 $trackingSince = $Now.ToString('yyyy-MM-dd', $Inv)
 if ($History.Count -gt 0) { $trackingSince = ([string]$History[0].RunId).Substring(0, 10) }
 
+# ---------------------------------------------------------------- 7. store locations (for distances and the map)
+
+function Get-DistanceKm($LatA, $LonA, $LatB, $LonB) {
+  $r = [math]::PI / 180
+  $a = [math]::Pow([math]::Sin(($LatB - $LatA) * $r / 2), 2) + [math]::Cos($LatA * $r) * [math]::Cos($LatB * $r) * [math]::Pow([math]::Sin(($LonB - $LonA) * $r / 2), 2)
+  return 6371 * 2 * [math]::Atan2([math]::Sqrt($a), [math]::Sqrt(1 - $a))
+}
+
+# Grocery and pharmacy locations from OpenStreetMap around the configured areas, Canada only,
+# matched to flyer stores with the storeMatch patterns. Uses curl.exe: the Overpass servers
+# need a newer TLS setup than Windows PowerShell 5.1 offers.
+function Get-Stores {
+  $rules = @($Config.storeMatch.PSObject.Properties | ForEach-Object { @{ m = $_.Name; rx = [string]$_.Value } })
+  $pts = @($Config.areas | Where-Object { $_.lat })
+  $lat = ($pts | Measure-Object -Property lat -Average).Average
+  $lon = ($pts | Measure-Object -Property lon -Average).Average
+  $radius = [int](1000 * (45 + (($pts | ForEach-Object { Get-DistanceKm $lat $lon $_.lat $_.lon }) | Measure-Object -Maximum).Maximum))
+  $rx = ($rules | ForEach-Object { $_.rx }) -join '|'
+  $around = "(area.ca)(around:$radius,$($lat.ToString($Inv)),$($lon.ToString($Inv)))"
+  $query = "[out:json][timeout:120];area[`"ISO3166-1`"=`"CA`"][admin_level=2]->.ca;(" +
+    "nwr[`"shop`"][`"name`"~`"$rx`",i]$around;nwr[`"shop`"][`"brand`"~`"$rx`",i]$around;nwr[`"amenity`"=`"pharmacy`"][`"name`"~`"$rx`",i]$around;);out center tags;"
+  $body = Join-Path $env:TEMP 'deals-overpass.txt'
+  [IO.File]::WriteAllText($body, 'data=' + [uri]::EscapeDataString($query))
+  foreach ($server in 'https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter') {
+    $raw = & curl.exe -s --max-time 150 -A 'WindsorEssexDealFinder/1.0' --data "@$body" $server
+    try { $j = ($raw -join "`n") | ConvertFrom-Json } catch { $j = $null }
+    if ($j -and $j.elements) { break }
+  }
+  if (-not $j -or -not $j.elements) { return $null }
+  $seen = @{}
+  $out = foreach ($e in $j.elements) {
+    $t = $e.tags
+    $name = [string]$t.name; $brand = [string]$t.brand
+    $m = $null
+    foreach ($r in $rules) { if ($name -match "(?i)$($r.rx)" -or ($brand -and $brand -match "(?i)$($r.rx)")) { $m = $r.m; break } }
+    if (-not $m) { continue }
+    $la = if ($e.lat) { [double]$e.lat } else { [double]$e.center.lat }
+    $lo = if ($e.lon) { [double]$e.lon } else { [double]$e.center.lon }
+    $key = '{0}|{1:N3}|{2:N3}' -f $m, $la, $lo
+    if ($seen.ContainsKey($key)) { continue }
+    $seen[$key] = 1
+    $addr = (@(("$($t.'addr:housenumber') $($t.'addr:street')").Trim(), [string]$t.'addr:city') | Where-Object { $_ }) -join ', '
+    @{ m = $m; n = $(if ($name) { $name } else { $brand }); a = $addr; lat = [math]::Round($la, 5); lon = [math]::Round($lo, 5) }
+  }
+  return @($out)
+}
+
+$StoresPath = Join-Path $DataDir 'stores.json'
+if (-not $ReportOnly -or -not (Test-Path $StoresPath)) {
+  $found = Get-Stores
+  if ($found) {
+    ($found | ConvertTo-Json -Compress -Depth 3) | Set-Content -Path $StoresPath -Encoding UTF8
+    Write-Log "Store locations: $($found.Count) stores for $(@($found | ForEach-Object { $_.m } | Select-Object -Unique).Count) flyer chains"
+  } else { Write-Log 'Store locations unavailable this run; keeping the last saved list.' }
+}
+$stores = @()
+# (ConvertFrom-Json hands back the whole array as one object in PS 5.1, so unroll it.)
+if (Test-Path $StoresPath) { $stores = @(([IO.File]::ReadAllText($StoresPath) | ConvertFrom-Json) | ForEach-Object { $_ }) }
+
 $data = @{
   meta = @{
     home          = $HomeArea
@@ -712,7 +771,10 @@ $data = @{
     maxPickPrice  = $(if ($Config.maxPickPrice) { [double]$Config.maxPickPrice } else { 35 })
     myMemberships = @($Config.myMemberships | Where-Object { $_ })
     notCovered    = 'Not included: Remark Fresh Markets (no online flyer) and stores that do not use Flipp.'
+    areaPoints    = @($Config.areas | Where-Object { $_.lat } | ForEach-Object { @{ name = $_.name; lat = [double]$_.lat; lon = [double]$_.lon } })
+    defaultLoc    = $Config.defaultLocation
   }
+  stores = $stores
   flyers = $flyerData
   items     = $itemData
   watch     = $watchData

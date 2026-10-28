@@ -1,5 +1,13 @@
 # Windsor-Essex Grocery Deals
 
+**Public page:** https://wby-sys.github.io/windsor-essex-deals/ (no login needed; anyone with the link can open it)
+
+It updates by itself every Thursday and Saturday around 8–9 AM Windsor time, even when your PC is off. GitHub Actions runs `app/Get-Deals.ps1` on GitHub's computers (see `.github/workflows/deals.yml`), saves `data/history.csv` back to this repository so price trends keep building, and publishes the page with GitHub Pages. To refresh it by hand, open the repository's **Actions** tab, choose **Update grocery deals** and click **Run workflow**.
+
+**Location and map:** tap the location button (pin icon) to enter any postal code or use your device's location, and pick a range from 5 to 40 km. Picks, search and flyers then only include stores with a location in range, and show how far each one is. **Store map** shows every store in range. Store locations come from OpenStreetMap (`data/stores.json`, refreshed each run; `storeMatch` in config.json links them to flyer stores). Postal codes are looked up with Esri's public geocoder, with OpenStreetMap and geocoder.ca as backups. Deals are only gathered for the Windsor-Essex `areas` in config.json.
+
+To change settings (watchlist, products, memberships), edit `config.json` on GitHub, or locally and then `git pull` and `git push`. The next run uses the new settings.
+
 - **latest-deals.html**: open this. It opens on **Top Picks**: the 3 best-value deals for each kind of product, aisle by aisle, with meat and produce first. Flyers, search, favourites and a shopping list are there too.
 - **share/windsor-essex-deals.html**: a copy you can share. It's built by `app\Build-Share.ps1` from latest-deals.html, with small copies of the pictures built in (hosted pages can't load pictures from other websites). It's published at https://claude.ai/artifact/B25cQ7XWsA44m3FwPXtxg9 and doesn't update by itself: rebuild it and ask Claude to republish it after new flyers come out.
 - **run-now.cmd**: double-click to refresh now and open the app.

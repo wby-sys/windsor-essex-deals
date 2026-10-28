@@ -24,8 +24,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .side{position:fixed;top:0;left:0;bottom:0;width:200px;background:var(--side);border-right:1px solid var(--line);overflow-y:auto;padding:14px 0 20px;z-index:20}
 .brand{display:block;padding:0 18px 14px;font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--blue);line-height:1}
 .brand small{display:block;font-size:11px;font-weight:500;letter-spacing:0;color:var(--muted);margin-top:4px}
-.loc{display:flex;align-items:center;gap:6px;margin:0 12px 10px;padding:9px 10px;border-radius:6px;background:#eef3fb;font-size:14px;font-weight:500;position:relative}
-.loc select{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.loc{display:flex;align-items:center;gap:6px;margin:0 12px 10px;padding:9px 10px;border-radius:6px;background:#eef3fb;font-size:14px;font-weight:500;width:calc(100% - 24px);text-align:left}
+.loc:hover{background:#e1ebfa}
 .loc .grow{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .snav a{display:flex;align-items:center;gap:10px;padding:7px 18px;font-size:16px}
 .snav a:hover{color:var(--blue)}
@@ -45,8 +45,33 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .tlinks{display:flex;align-items:center;gap:20px;margin-left:auto;font-size:15px;white-space:nowrap}
 .tlinks a,.tlinks label{display:flex;align-items:center;gap:6px;position:relative;cursor:pointer}
 .tlinks .badge{position:absolute;top:-7px;left:11px;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;border-radius:9px;padding:0 5px;min-width:17px;text-align:center;line-height:16px}
-.tloc{position:relative}
-.tloc select{position:absolute;inset:0;opacity:0;cursor:pointer}
+.tloc{display:flex;align-items:center;gap:6px}
+.tloc:hover{color:var(--blue)}
+.pick .ps .km{color:var(--muted);font-weight:500;margin-left:6px}
+.pick .ps .km::before{content:"\00b7";margin-right:6px}
+/* location dialog */
+.dlg.locdlg{display:block;max-width:460px}
+.locdlg h2{text-transform:none;font-size:20px;margin:0 0 14px}
+.locdlg label,.locdlg .lbl2{display:block;font-weight:700;font-size:13.5px;margin:12px 0 6px}
+.locdlg input{width:100%;font:inherit;font-size:17px;padding:10px 12px;border:1px solid #c9d1da;border-radius:6px;text-transform:uppercase;letter-spacing:.05em}
+.locdlg input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(7,106,226,.15)}
+.kms{display:flex;flex-wrap:wrap;gap:8px}
+.lacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.lmsg{min-height:1.4em;font-size:13.5px;color:var(--red);margin:10px 0 0}
+/* store map */
+.mapgrid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+.mapbox{background:#fff;box-shadow:var(--shadow);position:sticky;top:76px}
+#map{height:min(72vh,680px);width:100%}
+.mlist{display:flex;flex-direction:column;gap:8px;min-width:0}
+.mrow{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;background:#fff;box-shadow:var(--shadow);padding:10px 12px;cursor:pointer;font-size:13.5px}
+.mrow:hover,.mrow:focus-visible{outline:none;box-shadow:var(--shadow-hi)}
+.mrow img{width:40px;height:28px;object-fit:contain}
+.mrow .mi{min-width:0}
+.mrow .mi .muted{font-size:12.5px}
+.mrow .mm{font-size:12.5px;margin-top:2px}
+.mrow .mm a,.mpop a{color:var(--blue);font-weight:700}
+.mrow .md{font-weight:800;white-space:nowrap}
+.mpop{font:13.5px/1.45 "DM Sans","Segoe UI",system-ui,sans-serif}
 
 /* sub-tabs */
 .tabs{display:flex;gap:28px;padding:0 24px;background:#fff;border-bottom:1px solid var(--line);align-items:flex-end}
@@ -234,7 +259,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
   .tlinks{display:none}
   .mtop{display:flex;align-items:center;gap:8px;padding:10px 14px 0;background:#fff}
   .mtop .brand{padding:0;font-size:24px}
-  .mtop .loc{margin:0 0 0 auto;padding:6px 10px;font-size:13px;max-width:60%}
+  .mtop .loc{margin:0 0 0 auto;padding:6px 10px;font-size:13px;max-width:62%;width:auto}
   .tabs{padding:0 14px;gap:18px;overflow-x:auto}
   .tabs .right{display:none}
   .page{padding:16px 16px 90px}
@@ -245,6 +270,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
   .row{grid-auto-columns:150px}
   .fhead{top:61px;padding:10px 14px}
   .vgrid{grid-template-columns:1fr}
+  .mapgrid{grid-template-columns:1fr}
+  .mapbox{position:static}
+  #map{height:52vh}
+  .bnav a{font-size:10.5px}
   .pick{grid-template-columns:22px 46px 1fr auto 30px;gap:8px;padding:9px 12px}
   .pick > img,.pick .noimg{width:46px;height:46px}
   .dlg{grid-template-columns:1fr;padding:22px 18px;max-height:100vh}
@@ -284,6 +313,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
   // ------------------------------------------------------------ basics
   const $ = s => document.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const arr = v => Array.isArray(v) ? v : (v == null ? [] : [v]);
   const mem = {
     get(k, d) { try { const v = localStorage.getItem('df.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('df.' + k, JSON.stringify(v)); } catch (e) {} }
@@ -405,15 +435,43 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
   const tierBonus = x => TIERS > 1 ? 1.5 - 3 * Math.min(tier(x), TIERS - 1) / (TIERS - 1) : 0;
 
   // ------------------------------------------------------------ user state
+  // Location: a point (from a postal code or the device) plus a range in km.
+  const AREA_PT = {};
+  arr(M.areaPoints).forEach(a => { AREA_PT[a.name] = a; });
+  const STORES = arr(DATA.stores).filter(s => s && s.lat);
+  const HAS_STORES = new Set(STORES.map(s => s.m));
+  const RANGES = [5, 10, 15, 25, 40];
+  const DEF_LOC = M.defaultLoc || { pc: '', label: M.home, lat: 42.2879, lon: -82.7098, km: 15 };
   const S = {
-    area: mem.get('area', M.home),
+    loc: mem.get('loc', DEF_LOC),
     favs: mem.get('favs', []),
     list: mem.get('list', []),
     sort: mem.get('sort', {})
   };
-  const save = () => { mem.set('area', S.area); mem.set('favs', S.favs); mem.set('list', S.list); mem.set('sort', S.sort); };
-  const inArea = x => !S.area || x.ar.includes(S.area);
-  const areaName = () => S.area || 'Windsor-Essex';
+  const save = () => { mem.set('loc', S.loc); mem.set('favs', S.favs); mem.set('list', S.list); mem.set('sort', S.sort); };
+  function distKm(a, b) {
+    const r = Math.PI / 180, h = Math.sin((b.lat - a.lat) * r / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin((b.lon - a.lon) * r / 2) ** 2;
+    return 12742 * Math.asin(Math.sqrt(h));
+  }
+  let NEAR = {};
+  function computeNear() {
+    NEAR = {};
+    STORES.forEach(st => { const d = distKm(S.loc, st); if (!NEAR[st.m] || d < NEAR[st.m].d) NEAR[st.m] = { d, st }; });
+  }
+  computeNear();
+  // A deal counts when its chain has a store within your range (chains with no mapped stores: when
+  // their flyer covers a town within range), using the flyer version for your part of the region.
+  const areaWithin = (a, extra) => { const p = AREA_PT[a]; return !!p && distKm(S.loc, p) <= S.loc.km + extra; };
+  function inRange(m, ar) {
+    if (HAS_STORES.has(m)) return ar.some(a => areaWithin(a, 15)) && !!NEAR[m] && NEAR[m].d <= S.loc.km;
+    return ar.some(a => areaWithin(a, 3));
+  }
+  const inArea = x => inRange(x.m, x.ar);
+  const areaName = () => S.loc.label || S.loc.pc || 'you';
+  const locShort = () => (S.loc.pc || S.loc.label) + ' · ' + S.loc.km + ' km';
+  const distOf = m => HAS_STORES.has(m) && NEAR[m] ? NEAR[m].d : null;
+  const fmtKm = d => (d < 10 ? d.toFixed(1) : Math.round(d)) + ' km';
+  const distTxt = m => { const d = distOf(m); return d == null ? '' : fmtKm(d); };
   const isFav = m => S.favs.includes(m);
   const inList = id => S.list.some(e => e.k === 'i' && e.id === id);
   const areaItems = () => ITEMS.filter(inArea);
@@ -494,6 +552,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     if (x.s) meta.push('<span class="save">SAVE ' + x.s + '%</span>');
     meta.push('<span class="' + (x.when === 'soon' ? 'soon' : '') + '">' + esc(untilText(x.sd, x.e)) + '</span>');
     if (x.tc === 'good' && x.tr) meta.push('<span class="trend">' + esc(x.tr) + '</span>');
+    if (distTxt(x.m)) meta.push('<span>' + esc(distTxt(x.m)) + '</span>');
     return '<div class="clip" data-item="' + x.id + '">' + logoTab(x.m) +
       '<button type="button" class="add' + (inList(x.id) ? ' in' : '') + '" data-add="' + x.id + '" title="' + (inList(x.id) ? 'On your list' : 'Add to list') + '">' + (inList(x.id) ? ICON.check : ICON.plus) + '</button>' +
       '<div class="cimg">' + (x.i ? '<img loading="lazy" src="' + esc(x.i) + '" alt="">' : '') + '</div>' +
@@ -507,12 +566,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     return '<a class="fcard" href="#/flyer/' + f.id + (extra && extra.q ? '/' + encodeURIComponent(extra.q) : '') + '">' +
       '<div class="thumb">' + (f.th ? '<img loading="lazy" src="' + esc(f.th) + '" alt="">' : '') + '</div>' +
       '<div class="who">' + (f.lg ? '<img loading="lazy" src="' + esc(f.lg) + '" alt="">' : '') + '<div><div class="nm">' + esc(f.m) + '</div>' +
-      '<div class="sub">' + esc(untilText(f.sd, f.e)) + '</div>' +
+      '<div class="sub">' + esc(untilText(f.sd, f.e)) + (distTxt(f.m) ? ' &middot; ' + esc(distTxt(f.m)) : '') + '</div>' +
       (extra && extra.n ? '<div class="match">' + extra.n + ' matching item' + (extra.n === 1 ? '' : 's') + '</div>' : '') + '</div></div></a>';
   }
   const SORTS = {
     best: null,
     top: (a, b) => (tier(a) - tier(b)) || ((b.s || 0) - (a.s || 0)) || a.v - b.v,
+    near: (a, b) => ((distOf(a.m) == null ? 999 : distOf(a.m)) - (distOf(b.m) == null ? 999 : distOf(b.m))) || a.v - b.v,
     flyer: (a, b) => (Math.floor(a.x / 1200) - Math.floor(b.x / 1200)) || (b.y - a.y) || (a.x - b.x),
     price: (a, b) => a.v - b.v,
     lb: (a, b) => ((a.u === 'lb' ? 0 : 1) - (b.u === 'lb' ? 0 : 1)) || a.v - b.v,
@@ -520,13 +580,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     soon: (a, b) => a.e.localeCompare(b.e) || a.v - b.v,
     store: (a, b) => a.m.localeCompare(b.m) || a.v - b.v
   };
-  const SORT_LABELS = { value: 'Best value (unit price)', best: 'Best match', top: 'Best deals (meat & produce first)', flyer: 'Flyer order', deals: 'Biggest savings', price: 'Lowest price', lb: 'Price per lb', soon: 'Ending soonest', store: 'Store A-Z' };
+  const SORT_LABELS = { value: 'Best value (unit price)', best: 'Best match', top: 'Best deals (meat & produce first)', flyer: 'Flyer order', deals: 'Biggest savings', price: 'Lowest price', lb: 'Price per lb', soon: 'Ending soonest', store: 'Store A-Z', near: 'Nearest store' };
 
   // Shared item grid with Flipp-style store pills, sort and "on sale" toggle.
   let grid = null;
   function itemGrid(key, list, opts) {
     opts = opts || {};
-    const sorts = opts.sorts || ['best', 'top', 'deals', 'price', 'lb', 'soon', 'store'];
+    const sorts = opts.sorts || ['best', 'top', 'deals', 'price', 'lb', 'near', 'soon', 'store'];
     if (!grid || grid.key !== key) {
       grid = { key, store: '', dept: '', sale: false, within: '', shown: 60, sort: S.sort[opts.sortKey || 'items'] || sorts[0] };
       if (!sorts.includes(grid.sort)) grid.sort = sorts[0];
@@ -571,19 +631,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
   }
 
   // ------------------------------------------------------------ chrome (sidebar, top links, mobile nav)
-  function areaSelect() {
-    return '<select id="areaSel" aria-label="Choose area"><option value="">All of Windsor-Essex</option>' +
-      M.areas.map(a => '<option value="' + esc(a) + '"' + (a === S.area ? ' selected' : '') + '>' + esc(a) + '</option>').join('') + '</select>';
-  }
+  const locButton = cls => '<button type="button" class="' + cls + '" data-loc aria-label="Change location and range">' + ICON.pin + '<span class="grow">' + esc(locShort()) + '</span>' + ICON.down + '</button>';
   function chrome(route) {
     const fl = areaFlyers();
     const kinds = {};
     fl.forEach(f => { kinds[f.k] = (kinds[f.k] || 0) + 1; });
     const on = (r) => route === r ? ' class="on"' : '';
     let h = '<a class="brand" href="#/">dealfinder<small>Windsor-Essex flyers</small></a>' +
-      '<div class="loc">' + ICON.pin + '<span class="grow">' + esc(areaName()) + '</span>' + ICON.down + areaSelect() + '</div>' +
+      locButton('loc') +
       '<div class="snav">' +
       '<a href="#/"' + (route.startsWith('picks') ? ' class="on"' : '') + '>' + ICON.star + 'Top Picks</a>' +
+      '<a href="#/map"' + on('map') + '>' + ICON.pin + 'Store map</a>' +
       '<a href="#/favourites"' + on('favourites') + '>' + ICON.heart + 'Favourites</a>' +
       '<a href="#/flyers/all"' + on('flyers:all') + '>' + ICON.tag + 'Flyers</a>' +
       '<a href="#/list"' + on('list') + '>' + ICON.list + 'Shopping List' + (S.list.length ? '<span class="cnt">' + S.list.length + '</span>' : '') + '</a></div>' +
@@ -606,15 +664,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
       '</div><div class="sfoot">Updated ' + esc(M.updated) + '<br>' + FLYERS.length + ' flyers from ' + new Set(FLYERS.map(f => f.m)).size + ' stores' +
       (M.failures ? '<br><b>' + M.failures + ' downloads failed</b>' : '') + '<br><br>' + esc(M.notCovered) + '</div>';
     $('#side').innerHTML = h;
-    $('#mtop').innerHTML = '<a class="brand" href="#/">dealfinder</a><div class="loc">' + ICON.pin + '<span class="grow">' + esc(areaName()) + '</span>' + ICON.down + areaSelect() + '</div>';
-    $('#tlinks').innerHTML = '<label class="tloc">' + ICON.pin + esc(areaName()) + ICON.down + areaSelect() + '</label>' +
+    $('#mtop').innerHTML = '<a class="brand" href="#/">dealfinder</a>' + locButton('loc');
+    $('#tlinks').innerHTML = locButton('tloc') +
+      '<a href="#/map">' + ICON.pin + 'Store map</a>' +
       '<a href="#/list">' + ICON.list + (S.list.length ? '<span class="badge">' + S.list.length + '</span>' : '') + 'Shopping List</a>';
     const bon = r => route.startsWith(r) ? ' class="on"' : '';
-    $('#bnav').innerHTML = '<a href="#/"' + bon('picks') + '>' + ICON.star + 'Top Picks</a>' +
+    $('#bnav').innerHTML = '<a href="#/"' + bon('picks') + '>' + ICON.star + 'Picks</a>' +
       '<a href="#/search/"' + bon('search') + ' id="bsearch">' + ICON.search + 'Search</a>' +
+      '<a href="#/map"' + bon('map') + '>' + ICON.pin + 'Map</a>' +
       '<a href="#/list"' + bon('list') + '>' + ICON.list + (S.list.length ? '<span class="badge">' + S.list.length + '</span>' : '') + 'List</a>' +
       '<a href="#/flyers/all"' + bon('flyers') + '>' + ICON.flyers + 'Flyers</a>' +
-      '<a href="#/favourites"' + bon('favourites') + '>' + ICON.heart + 'Favourites</a>';
+      '<a href="#/favourites"' + bon('favourites') + '>' + ICON.heart + 'Saved</a>';
   }
 
   // ------------------------------------------------------------ views
@@ -622,6 +682,126 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
   function tabs(items, active, right) {
     return '<nav class="tabs">' + items.map(([id, label, n, href]) => '<a href="' + href + '"' + (id === active ? ' class="on"' : '') + '>' + esc(label) + (n != null ? '<span class="n">' + n + '</span>' : '') + '</a>').join('') +
       (right ? '<span class="right">' + esc(right) + '</span>' : '') + '</nav>';
+  }
+
+  function emptyRange(what) {
+    return '<div class="empty"><b>' + esc(what) + ' within ' + S.loc.km + ' km of ' + esc(areaName()) + '</b>' +
+      'Try a bigger range or another postal code. Deals are gathered for Windsor-Essex flyers.<br><br>' +
+      '<button type="button" class="btn solid" data-loc>Change location or range</button></div>';
+  }
+
+  // ---- Location: postal code or device location, plus a range.
+  let locKm = S.loc.km;
+  function openLocation() {
+    locKm = S.loc.km;
+    $('#modal').innerHTML = '<div class="ov" id="ov"><div class="dlg locdlg" role="dialog" aria-modal="true" aria-labelledby="loch">' +
+      '<button type="button" class="x" id="mclose" aria-label="Close">' + ICON.x + '</button>' +
+      '<h2 id="loch">Where are you shopping?</h2>' +
+      '<form id="locf"><label for="locpc">Postal code</label>' +
+      '<input id="locpc" value="' + esc(S.loc.pc) + '" placeholder="N0R 1A0" autocomplete="postal-code" maxlength="7" inputmode="text">' +
+      '<div class="lbl2">How far will you drive?</div><div class="kms">' +
+      RANGES.map(k => '<button type="button" class="pill' + (k === locKm ? ' on' : '') + '" data-km="' + k + '">' + k + ' km</button>').join('') + '</div>' +
+      '<div class="lacts"><button type="submit" class="btn solid">Show deals</button>' +
+      '<button type="button" class="btn" id="locgps">' + ICON.pin + 'Use my location</button></div>' +
+      '<p class="lmsg" id="locmsg" role="status"></p></form>' +
+      '<p class="muted" style="font-size:12.5px;margin:4px 0 0">Distances are straight-line to each store\'s nearest location. Store locations come from OpenStreetMap.</p></div></div>';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => $('#locpc') && $('#locpc').focus(), 30);
+  }
+  async function geocode(pc) {
+    const clean = pc.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(clean)) throw new Error('Enter a full postal code, like N0R 1A0.');
+    const spaced = clean.slice(0, 3) + ' ' + clean.slice(3);
+    // Esri's public geocoder knows full Canadian postal codes; OpenStreetMap and geocoder.ca are backups.
+    try {
+      const r = await fetch('https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=' + encodeURIComponent(spaced) +
+        '&countryCode=CAN&category=Postal&maxLocations=1&outFields=City&f=json');
+      const c = ((await r.json()).candidates || [])[0];
+      if (c && c.score >= 75) return { pc: spaced, label: (c.attributes && c.attributes.City) || spaced, lat: c.location.y, lon: c.location.x };
+    } catch (e) { /* try the next service */ }
+    try {
+      const r = await fetch('https://nominatim.openstreetmap.org/search?postalcode=' + encodeURIComponent(spaced) + '&country=ca&format=json&limit=1&addressdetails=1');
+      const j = await r.json();
+      if (j[0]) { const a = j[0].address || {}; return { pc: spaced, label: a.town || a.city || a.village || a.municipality || a.county || spaced, lat: +j[0].lat, lon: +j[0].lon }; }
+    } catch (e) { /* try the next service */ }
+    try {
+      const r = await fetch('https://geocoder.ca/?locate=' + clean + '&json=1');
+      const j = await r.json();
+      if (j.latt) return { pc: spaced, label: (j.standard && typeof j.standard.city === 'string' && j.standard.city) || spaced, lat: +j.latt, lon: +j.longt };
+    } catch (e) { /* fall through */ }
+    throw new Error('Couldn\'t find ' + spaced + '. Check it, or use your location instead.');
+  }
+  function setLocation(loc) {
+    S.loc = Object.assign({}, loc, { km: locKm });
+    save(); computeNear(); grid = null;
+    closeItem(); render();
+  }
+
+  // ---- Store map (Leaflet, loaded only when the map opens)
+  let leafletP = null, mapObj = null, mapMarkers = [];
+  function loadLeaflet() {
+    if (window.L) return Promise.resolve();
+    if (leafletP) return leafletP;
+    leafletP = new Promise((res, rej) => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet'; css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+      document.head.appendChild(css);
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+      s.onload = () => res(); s.onerror = () => { leafletP = null; rej(new Error('map library')); };
+      document.head.appendChild(s);
+    });
+    return leafletP;
+  }
+  function viewMap() {
+    const all = STORES.map(st => ({ st, d: distKm(S.loc, st) })).sort((a, b) => a.d - b.d);
+    const near = all.filter(x => x.d <= S.loc.km);
+    const counts = {};
+    dedupe(areaItems()).forEach(x => { counts[x.m] = (counts[x.m] || 0) + 1; });
+    const fl = areaFlyers();
+    const flyerOf = m => fl.find(f => f.m === m);
+    const unmapped = [...new Set(fl.map(f => f.m))].filter(m => !HAS_STORES.has(m));
+    const row = (x, i) => {
+      const f = flyerOf(x.st.m);
+      return '<div class="mrow" data-mi="' + i + '" tabindex="0">' + (LOGO[x.st.m] ? '<img src="' + esc(LOGO[x.st.m]) + '" alt="">' : '<span></span>') +
+        '<div class="mi"><b>' + esc(x.st.n) + '</b><div class="muted">' + esc(x.st.a || 'Address not listed') + '</div>' +
+        '<div class="mm">' + (counts[x.st.m] ? counts[x.st.m] + ' deals this week' : 'No flyer deals this week') + (f ? ' &middot; <a href="#/flyer/' + f.id + '">Open flyer</a>' : '') + '</div></div>' +
+        '<div class="md">' + esc(fmtKm(x.d)) + '</div></div>';
+    };
+    V.innerHTML = '<div class="page"><div class="phead"><h1>Stores within ' + S.loc.km + ' km of ' + esc(areaName()) + '</h1>' +
+      '<p>' + near.length + ' store' + (near.length === 1 ? '' : 's') + ' in range. Tap a store for its address and this week\'s flyer.</p></div>' +
+      '<div class="pills">' + locButton('pill') + '</div>' +
+      '<div class="mapgrid"><div class="mapbox"><div id="map" role="region" aria-label="Map of stores"></div></div>' +
+      '<div class="mlist">' + (near.length ? near.map(row).join('') : emptyRange('No mapped stores')) +
+      (unmapped.length ? '<p class="muted" style="font-size:12.5px;margin:10px 4px">Also in range, but not on the map (OpenStreetMap has no location for them): ' + esc(unmapped.join(', ')) + '.</p>' : '') +
+      '</div></div></div>';
+    loadLeaflet().then(() => drawMap(all, counts, flyerOf)).catch(() => {
+      const m = $('#map'); if (m) m.innerHTML = '<div class="empty">The map couldn\'t load. The list shows the same stores.</div>';
+    });
+  }
+  function drawMap(all, counts, flyerOf) {
+    const box = $('#map');
+    if (!box || !window.L || box._leaflet_id) return;   // gone, or already drawn by an earlier call
+    if (mapObj) { mapObj.remove(); mapObj = null; }
+    const L = window.L, here = [S.loc.lat, S.loc.lon];
+    // Range box worked out directly, so it doesn't depend on the map having a view yet.
+    const dLat = S.loc.km / 111, dLon = S.loc.km / (111 * Math.cos(S.loc.lat * Math.PI / 180));
+    const bounds = L.latLngBounds([S.loc.lat - dLat, S.loc.lon - dLon], [S.loc.lat + dLat, S.loc.lon + dLon]);
+    mapObj = L.map(box, { scrollWheelZoom: true }).fitBounds(bounds, { padding: [16, 16] });
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(mapObj);
+    L.circle(here, { radius: S.loc.km * 1000, color: '#076ae2', weight: 1.5, fillColor: '#076ae2', fillOpacity: 0.05 }).addTo(mapObj);
+    L.circleMarker(here, { radius: 8, color: '#fff', weight: 3, fillColor: '#d93025', fillOpacity: 1 }).addTo(mapObj).bindTooltip('You: ' + areaName());
+    mapMarkers = [];
+    all.filter(x => x.d <= S.loc.km * 1.6 + 5).forEach(x => {
+      const inR = x.d <= S.loc.km, f = flyerOf(x.st.m);
+      const mk = L.circleMarker([x.st.lat, x.st.lon], inR
+        ? { radius: 7, color: '#fff', weight: 2, fillColor: '#076ae2', fillOpacity: 1 }
+        : { radius: 5, color: '#fff', weight: 1, fillColor: '#8493a6', fillOpacity: 0.8 }).addTo(mapObj);
+      mk.bindPopup('<div class="mpop"><b>' + esc(x.st.n) + '</b><br>' + esc(x.st.a || '') + (x.st.a ? '<br>' : '') + esc(fmtKm(x.d)) + (inR ? '' : ' (outside your range)') +
+        (counts[x.st.m] ? '<br>' + counts[x.st.m] + ' deals this week' : '') + (f && inR ? '<br><a href="#/flyer/' + f.id + '">Open flyer</a>' : '') + '</div>');
+      if (inR) mapMarkers.push(mk);
+    });
+    setTimeout(() => mapObj && mapObj.invalidateSize(), 50);
   }
 
   function viewFlyers(kind, order) {
@@ -634,7 +814,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     let h = tabs([['featured', 'Featured', null, base + 'featured'], ['latest', 'Latest', null, base + 'latest'], ['az', 'A-Z', null, base + 'az']], order,
       areaName() + ' ' + (kind === 'all' ? '' : kind + ' ') + 'flyers');
     h += '<div class="page">';
-    h += fl.length ? '<div class="fgrid">' + fl.map(f => flyerCard(f)).join('') + '</div>' : '<div class="empty"><b>No flyers here</b>Try another area.</div>';
+    h += fl.length ? '<div class="fgrid">' + fl.map(f => flyerCard(f)).join('') + '</div>' : emptyRange('No flyers');
     h += '</div>';
     V.innerHTML = h;
   }
@@ -649,7 +829,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     return '<div class="pick' + (rank === 1 ? ' first' : '') + '" data-item="' + x.id + '">' +
       '<span class="medal m' + rank + '">' + rank + '</span>' +
       (x.i ? '<img loading="lazy" src="' + esc(x.i) + '" alt="">' : '<span class="noimg"></span>') +
-      '<div class="pi"><div class="ps">' + (LOGO[x.m] ? '<img loading="lazy" src="' + esc(LOGO[x.m]) + '" alt="">' : '') + esc(x.m) + '</div>' +
+      '<div class="pi"><div class="ps">' + (LOGO[x.m] ? '<img loading="lazy" src="' + esc(LOGO[x.m]) + '" alt="">' : '') + esc(x.m) +
+      (distTxt(x.m) ? '<span class="km">' + esc(distTxt(x.m)) + '</span>' : '') + '</div>' +
       '<div class="pn">' + esc(x.n) + '</div>' + (condBadges(x) ? '<div>' + condBadges(x) + '</div>' : '') +
       '<div class="pm">' + pm.join(' &middot; ') + '</div></div>' +
       '<div class="pp"><div class="big">' + priceHtml(x) + '</div>' + (ul ? '<div class="ul">' + esc(ul) + '</div>' : '') + '</div>' +
@@ -686,7 +867,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     const cards = pickCards();
     const listCount = cards.filter(c => c.v.l).length;
     const inSec = s => cards.filter(c => c.v.s === s);
-    let h = '<div class="page"><div class="phead"><h1>Top picks near ' + esc(areaName()) + '</h1>' +
+    let h = '<div class="page"><div class="phead"><h1>Top picks within ' + S.loc.km + ' km of ' + esc(areaName()) + '</h1>' +
       '<p>The 3 best-value deals for ' + cards.length + ' kinds of products, so you don\'t have to read the flyers. Ranked by unit price (per lb, kg, litre or piece) so different sizes compare fairly. ' +
       (MINE.length ? 'Member prices for your memberships (' + esc(M.myMemberships.join(', ')) + ') are included and marked in blue; any other membership deals and online-only prices are left out.'
         : 'Prices that need a membership (PC Optimum, Scene+ or moi member prices, and Costco) are left out.') + ' Other conditions like "Must buy 2" are labelled.</p></div>';
@@ -715,7 +896,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
       });
       h += '</section>';
     });
-    if (!cards.length) h += '<div class="empty"><b>No picks near ' + esc(areaName()) + '</b>Try switching the area to All of Windsor-Essex.</div>';
+    if (!cards.length) h += emptyRange('No picks');
     V.innerHTML = h + '</div>';
   }
   function viewVariety(term) {
@@ -723,7 +904,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     if (!v) { go('#/search/' + encodeURIComponent(term), true); return; }
     V.innerHTML = '<div class="page"><a href="' + pickHref(v.s, v.g) + '" style="color:var(--blue);font-size:14px">&lsaquo; ' + esc(v.g === v.s ? v.s : v.s + ': ' + v.g) + ' picks</a>' +
       '<div class="h" style="margin-top:10px">' + esc(term) + ' - ' + esc(areaName()) + '</div>' +
-      itemGrid('variety:' + term, varietyItems(v), { sorts: ['value', 'price', 'deals', 'soon', 'store'], sortKey: 'variety' }) + '</div>';
+      itemGrid('variety:' + term, varietyItems(v), { sorts: ['value', 'price', 'deals', 'near', 'soon', 'store'], sortKey: 'variety' }) + '</div>';
     drawGrid();
   }
 
@@ -766,7 +947,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     if (tab !== 'items' && fl.length) {
       h += '<div class="h mt">' + esc(title) + ' - FLYERS</div><div class="fgrid">' + fl.map(f => flyerCard(f, { n: byStore[f.id], q })).join('') + '</div>';
     }
-    if (!hits.length) h += '<div class="empty"><b>No deals for "' + esc(q) + '" near ' + esc(areaName()) + '</b>Check the spelling, try a shorter word, or switch the area to All of Windsor-Essex.</div>';
+    if (!hits.length) h += '<div class="empty"><b>No deals for "' + esc(q) + '" within ' + S.loc.km + ' km of ' + esc(areaName()) + '</b>Check the spelling, try a shorter word, or widen your range.<br><br><button type="button" class="btn solid" data-loc>Change location or range</button></div>';
     h += '</div>';
     V.innerHTML = h;
     drawGrid();
@@ -775,7 +956,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
   function viewAisle(dept) {
     const list = dedupe(areaItems().filter(x => x.d === dept));
     V.innerHTML = '<div class="page"><div class="h">' + esc(dept) + ' - ' + esc(areaName()) + '</div>' +
-      itemGrid('aisle:' + dept, list, { sorts: ['deals', 'price', 'lb', 'soon', 'store'], sortKey: 'aisle' }) + '</div>';
+      itemGrid('aisle:' + dept, list, { sorts: ['deals', 'price', 'lb', 'near', 'soon', 'store'], sortKey: 'aisle' }) + '</div>';
     drawGrid();
   }
 
@@ -783,7 +964,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     const fl = areaFlyers().filter(f => isFav(f.m)).sort((a, b) => a.m.localeCompare(b.m));
     let h = '<div class="page"><div class="h">Favourites</div>';
     if (!S.favs.length) h += '<div class="empty"><b>No favourite stores yet</b>Open a flyer and tap the heart to keep it here.</div>';
-    else if (!fl.length) h += '<div class="empty"><b>Your favourite stores have no flyers in ' + esc(areaName()) + '</b>Try another area.</div>';
+    else if (!fl.length) h += emptyRange('None of your favourite stores');
     else {
       h += '<div class="fgrid">' + fl.map(f => flyerCard(f)).join('') + '</div>';
       const fav = dedupe(areaItems().filter(x => isFav(x.m) && x.s && !NONFOOD.includes(x.d))).sort(SORTS.top).slice(0, 30);
@@ -864,7 +1045,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     if (x.op) desc.push('Regular price ' + esc(x.op));
     if (x.b.length) desc.push('Brand: ' + esc(x.b.join(', ')));
     desc.push('Aisle: <a href="#/aisle/' + encodeURIComponent(x.d) + '" style="color:var(--blue)">' + esc(x.d) + '</a>');
-    desc.push('Flyer reaches: ' + esc(x.ar.join(', ')));
+    const nb = HAS_STORES.has(x.m) && NEAR[x.m];
+    desc.push(nb ? 'Nearest store: ' + esc(nb.st.n) + (nb.st.a ? ', ' + esc(nb.st.a) : '') + ' &middot; <b>' + esc(fmtKm(nb.d)) + '</b> <a href="#/map" style="color:var(--blue)">map</a>'
+      : 'Flyer covers: ' + esc(x.ar.join(', ')));
     const sims = similar(x);
     const cheaper = sims.filter(y => y.u === x.u && y.v < x.v).length;
     let h = '<div class="ov" id="ov"><div class="dlg" role="dialog" aria-modal="true">' +
@@ -923,6 +1106,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
   function render() {
     const parts = ROUTE.replace(/^#\/?/, '').split('/').map(s => { try { return decodeURIComponent(s); } catch (e) { return s; } });
     const v = parts[0] || '';
+    if (mapObj) { mapObj.remove(); mapObj = null; }
     let key;
     if (v === 'flyer') { key = 'flyer'; viewFlyer(parts[1], parts[2]); }
     else if (v === 'search') { key = 'search'; $('#q').value = parts[1] || ''; viewSearch(parts[1] || '', parts[2]); }
@@ -931,6 +1115,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     else if (v === 'favourites') { key = 'favourites'; viewFavourites(); }
     else if (v === 'flyers') { const kind = parts[1] || 'all'; key = 'flyers:' + kind; viewFlyers(kind, parts[2]); }
     else if (v === 'variety') { key = 'variety'; viewVariety(parts[1] || ''); }
+    else if (v === 'map') { key = 'map'; viewMap(); }
     else { key = 'picks:' + (v === 'picks' ? (parts[1] || '') + ':' + (parts[2] || '') : ':'); viewPicks(v === 'picks' ? parts[1] : '', v === 'picks' ? parts[2] : ''); }
     if (v !== 'search') $('#q').value = '';
     $('#sbox').classList.toggle('has', !!$('#q').value);
@@ -959,7 +1144,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 
   document.addEventListener('change', e => {
     const t = e.target;
-    if (t.id === 'areaSel') { S.area = t.value; save(); grid = null; return render(); }
     if (t.id === 'gsort') { grid.sort = t.value; S.sort[grid.opts.sortKey || 'items'] = t.value; save(); grid.shown = 60; return drawGrid(); }
     if (t.id === 'gdept') { grid.dept = t.value; grid.shown = 60; return drawGrid(); }
     if (t.dataset.done) { const en = S.list.find(x => x.uid === t.dataset.done); if (en) { en.done = t.checked; save(); viewList(); chrome('list'); } }
@@ -970,7 +1154,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
       qt = setTimeout(() => { grid.within = e.target.value; grid.shown = 60; drawGrid(); const w = $('#within'); if (w) { w.focus(); w.setSelectionRange(w.value.length, w.value.length); } }, 250);
     }
   });
-  document.addEventListener('submit', e => {
+  document.addEventListener('submit', async e => {
+    if (e.target.id === 'locf') {
+      e.preventDefault();
+      const msg = $('#locmsg'), pc = $('#locpc').value.trim();
+      if (!pc) { msg.textContent = 'Enter a postal code, or use your location.'; return; }
+      if (pc.replace(/\s/g, '').toUpperCase() === (S.loc.pc || '').replace(/\s/g, '')) return setLocation(S.loc);
+      msg.textContent = 'Finding ' + pc.toUpperCase() + '...';
+      try { setLocation(await geocode(pc)); } catch (err) { msg.textContent = err.message; }
+      return;
+    }
     if (e.target.id === 'laddf') {
       e.preventDefault();
       const v = $('#ladd').value.trim();
@@ -995,6 +1188,21 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     const item = t.closest('[data-item]');
     if (item) { e.preventDefault(); return openItem(item.dataset.item); }
     if (t.closest('[data-back]')) return goBack();
+    if (t.closest('[data-loc]')) return openLocation();
+    const kb = t.closest('[data-km]');
+    if (kb) { locKm = +kb.dataset.km; document.querySelectorAll('[data-km]').forEach(b => b.classList.toggle('on', +b.dataset.km === locKm)); return; }
+    if (t.closest('#locgps')) {
+      const msg = $('#locmsg');
+      if (!navigator.geolocation) { msg.textContent = 'This browser can\'t share your location. Enter a postal code instead.'; return; }
+      msg.textContent = 'Getting your location...';
+      navigator.geolocation.getCurrentPosition(
+        p => setLocation({ pc: '', label: 'your location', lat: p.coords.latitude, lon: p.coords.longitude }),
+        () => { msg.textContent = 'Location was blocked or unavailable. Enter a postal code instead.'; },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
+      return;
+    }
+    const mr = t.closest('[data-mi]');
+    if (mr && !t.closest('a')) { const mk = mapMarkers[+mr.dataset.mi]; if (mk && mapObj) { mapObj.setView(mk.getLatLng(), Math.max(mapObj.getZoom(), 14)); mk.openPopup(); } return; }
     const link = t.closest('a[href^="#/"]');
     if (link) {
       e.preventDefault();
