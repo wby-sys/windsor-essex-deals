@@ -1,4 +1,4 @@
-# Downloads the Windsor-Essex flyers twice a week on GitHub's computers, saves the price
+# Downloads the flyers (Windsor-Essex, Kingston) twice a week on GitHub's computers, saves the price
 # history back to this repository, and publishes the deals page on GitHub Pages.
 name: Update grocery deals
 

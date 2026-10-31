@@ -1,16 +1,19 @@
 {
   "homeArea": "Belle River",
+  "_areasHelp": "Places whose flyers are collected. Each region (a city or county) gets its own flyers, price history and store map; areas are postal codes inside it (stores sometimes run different flyers in different parts of a city). To add a city, add one or two areas with a new region name, then run app\\Get-Deals.ps1 once on a PC so its store locations are saved.",
   "areas": [
-    { "name": "Belle River",      "postal": "N0R1A0", "lat": 42.2879, "lon": -82.7098 },
-    { "name": "Tecumseh",         "postal": "N8N1A1", "lat": 42.3070, "lon": -82.8870 },
-    { "name": "Windsor East",     "postal": "N8T1A1", "lat": 42.3120, "lon": -82.9560 },
-    { "name": "Windsor Downtown", "postal": "N9A1A1", "lat": 42.3170, "lon": -83.0370 },
-    { "name": "South Windsor",    "postal": "N9G1A1", "lat": 42.2576, "lon": -82.9987 },
-    { "name": "LaSalle",          "postal": "N9J1A1", "lat": 42.2280, "lon": -83.0560 },
-    { "name": "Amherstburg",      "postal": "N9V1A1", "lat": 42.1010, "lon": -83.1080 },
-    { "name": "Essex",            "postal": "N8M1A1", "lat": 42.1750, "lon": -82.8190 },
-    { "name": "Kingsville",       "postal": "N9Y1A1", "lat": 42.0380, "lon": -82.7390 },
-    { "name": "Leamington",       "postal": "N8H1A1", "lat": 42.0530, "lon": -82.5990 }
+    { "region": "Windsor-Essex", "name": "Belle River",      "postal": "N0R1A0", "lat": 42.2879, "lon": -82.7098 },
+    { "region": "Windsor-Essex", "name": "Tecumseh",         "postal": "N8N1A1", "lat": 42.3070, "lon": -82.8870 },
+    { "region": "Windsor-Essex", "name": "Windsor East",     "postal": "N8T1A1", "lat": 42.3120, "lon": -82.9560 },
+    { "region": "Windsor-Essex", "name": "Windsor Downtown", "postal": "N9A1A1", "lat": 42.3170, "lon": -83.0370 },
+    { "region": "Windsor-Essex", "name": "South Windsor",    "postal": "N9G1A1", "lat": 42.2576, "lon": -82.9987 },
+    { "region": "Windsor-Essex", "name": "LaSalle",          "postal": "N9J1A1", "lat": 42.2280, "lon": -83.0560 },
+    { "region": "Windsor-Essex", "name": "Amherstburg",      "postal": "N9V1A1", "lat": 42.1010, "lon": -83.1080 },
+    { "region": "Windsor-Essex", "name": "Essex",            "postal": "N8M1A1", "lat": 42.1750, "lon": -82.8190 },
+    { "region": "Windsor-Essex", "name": "Kingsville",       "postal": "N9Y1A1", "lat": 42.0380, "lon": -82.7390 },
+    { "region": "Windsor-Essex", "name": "Leamington",       "postal": "N8H1A1", "lat": 42.0530, "lon": -82.5990 },
+    { "region": "Kingston",      "name": "Kingston",         "postal": "K7L3N6", "lat": 44.2226, "lon": -76.5058 },
+    { "region": "Kingston",      "name": "Kingston West",    "postal": "K7P1A1", "lat": 44.2497, "lon": -76.5835 }
   ],
 
   "_locationHelp": "Where the page starts (people can change it with their own postal code). km is the starting range.",
@@ -27,6 +30,8 @@
     "Your Independent Grocer": "independent( city market)?$|your independent grocer",
     "Metro": "^metro( plus)?$",
     "Sobeys": "sobeys",
+    "Farm Boy": "farm boy",
+    "Loblaws": "^loblaws?$",
     "Foodland": "foodland",
     "Costco": "costco",
     "Giant Tiger": "giant tiger",

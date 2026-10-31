@@ -4,7 +4,15 @@
 
 It updates by itself every Thursday and Saturday around 8–9 AM Windsor time, even when your PC is off. GitHub Actions runs `app/Get-Deals.ps1` on GitHub's computers (see `.github/workflows/deals.yml`), saves `data/history.csv` back to this repository so price trends keep building, and publishes the page with GitHub Pages. To refresh it by hand, open the repository's **Actions** tab, choose **Update grocery deals** and click **Run workflow**.
 
-**Location and map:** tap the location button (pin icon) to enter any postal code or use your device's location, and pick a range from 5 to 40 km. Picks, search and flyers then only include stores with a location in range, and show how far each one is. **Store map** shows every store in range. Store locations come from OpenStreetMap (`data/stores.json`; `storeMatch` in config.json links them to flyer stores). The OpenStreetMap servers don't answer GitHub's computers, so the cloud runs use the saved list. To refresh it, run `app\Get-Deals.ps1` on a PC, then commit and push `data/stores.json`. Postal codes are looked up with Esri's public geocoder, with OpenStreetMap and geocoder.ca as backups. Deals are only gathered for the Windsor-Essex `areas` in config.json.
+**Location and map:** tap the location button (pin icon) to enter any postal code or use your device's location, and pick a range from 5 to 40 km. Picks, search and flyers then only include stores with a location in range, and show how far each one is. **Store map** shows every store in range. Store locations come from OpenStreetMap (`data/stores.json`; `storeMatch` in config.json links them to flyer stores). The OpenStreetMap servers don't answer GitHub's computers, so the cloud runs use the saved list. To refresh it, run `app\Get-Deals.ps1` on a PC, then commit and push `data/stores.json`. Postal codes are looked up with Esri's public geocoder, with OpenStreetMap and geocoder.ca as backups.
+
+**Regions:** deals are gathered for the regions in config.json: **Windsor-Essex** and **Kingston**. A postal code anywhere else finds no deals, and the page says so. Each region has its own flyers, price history and store map. To add a city:
+1. Add one or two `areas` with a new `region` name and a postal code from that city.
+2. If the city has chains that aren't in `storeMatch` yet, add them.
+3. Run `app\Get-Deals.ps1` once on a PC so the city's store locations are saved.
+4. Commit and push.
+
+Each region adds a few minutes to the GitHub run and about 1.5 MB to the page.
 
 To change settings (watchlist, products, memberships), edit `config.json` on GitHub, or locally and then `git pull` and `git push`. The next run uses the new settings.
 

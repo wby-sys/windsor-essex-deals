@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Windsor-Essex Deal Finder</title>
+<title>Grocery Deal Finder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -439,7 +439,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
   const AREA_PT = {};
   arr(M.areaPoints).forEach(a => { AREA_PT[a.name] = a; });
   const STORES = arr(DATA.stores).filter(s => s && s.lat);
-  const HAS_STORES = new Set(STORES.map(s => s.m));
+  // Regions (Windsor-Essex, Kingston...) whose flyers are collected, and the chains with stores on
+  // the map in each one (stores saved before regions existed are in the first region).
+  const REGIONS = arr(M.regions);
+  const MAPPED = new Set(STORES.map(s => (s.r || REGIONS[0]) + '|' + s.m));
   const RANGES = [5, 10, 15, 25, 40];
   const DEF_LOC = M.defaultLoc || { pc: '', label: M.home, lat: 42.2879, lon: -82.7098, km: 15 };
   const S = {
@@ -453,23 +456,30 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     const r = Math.PI / 180, h = Math.sin((b.lat - a.lat) * r / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin((b.lon - a.lon) * r / 2) ** 2;
     return 12742 * Math.asin(Math.sqrt(h));
   }
-  let NEAR = {};
+  // Your region is the one with an area near your location, or none when you're far from all of them.
+  let NEAR = {}, MYREGION = null;
   function computeNear() {
     NEAR = {};
     STORES.forEach(st => { const d = distKm(S.loc, st); if (!NEAR[st.m] || d < NEAR[st.m].d) NEAR[st.m] = { d, st }; });
+    let best = null;
+    arr(M.areaPoints).forEach(a => { const d = distKm(S.loc, a); if (a.r && (!best || d < best.d)) best = { d, r: a.r }; });
+    MYREGION = best && best.d <= S.loc.km + 40 ? best.r : null;
   }
   computeNear();
-  // A deal counts when its chain has a store within your range (chains with no mapped stores: when
-  // their flyer covers a town within range), using the flyer version for your part of the region.
+  const myRegion = () => MYREGION;
+  const listJoin = xs => xs.length < 2 ? xs.join('') : xs.slice(0, -1).join(', ') + ' and ' + xs[xs.length - 1];
+  const mapped = m => !!MYREGION && MAPPED.has(MYREGION + '|' + m);
+  // A deal counts when its chain has a store within your range (chains with no mapped stores in your
+  // region: when their flyer covers a town within range), using the flyer version for your part of the region.
   const areaWithin = (a, extra) => { const p = AREA_PT[a]; return !!p && distKm(S.loc, p) <= S.loc.km + extra; };
   function inRange(m, ar) {
-    if (HAS_STORES.has(m)) return ar.some(a => areaWithin(a, 15)) && !!NEAR[m] && NEAR[m].d <= S.loc.km;
+    if (mapped(m)) return ar.some(a => areaWithin(a, 15)) && !!NEAR[m] && NEAR[m].d <= S.loc.km;
     return ar.some(a => areaWithin(a, 3));
   }
   const inArea = x => inRange(x.m, x.ar);
   const areaName = () => S.loc.label || S.loc.pc || 'you';
   const locShort = () => (S.loc.pc || S.loc.label) + ' · ' + S.loc.km + ' km';
-  const distOf = m => HAS_STORES.has(m) && NEAR[m] ? NEAR[m].d : null;
+  const distOf = m => mapped(m) && NEAR[m] ? NEAR[m].d : null;
   const fmtKm = d => (d < 10 ? d.toFixed(1) : Math.round(d)) + ' km';
   const distTxt = m => { const d = distOf(m); return d == null ? '' : fmtKm(d); };
   const isFav = m => S.favs.includes(m);
@@ -637,7 +647,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     const kinds = {};
     fl.forEach(f => { kinds[f.k] = (kinds[f.k] || 0) + 1; });
     const on = (r) => route === r ? ' class="on"' : '';
-    let h = '<a class="brand" href="#/">dealfinder<small>Windsor-Essex flyers</small></a>' +
+    const region = myRegion();
+    document.title = (region || 'Grocery') + ' Deal Finder';
+    let h = '<a class="brand" href="#/">dealfinder<small>' + esc((region || listJoin(REGIONS)) + ' flyers') + '</small></a>' +
       locButton('loc') +
       '<div class="snav">' +
       '<a href="#/"' + (route.startsWith('picks') ? ' class="on"' : '') + '>' + ICON.star + 'Top Picks</a>' +
@@ -661,7 +673,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
           return r;
         }).join('');
       })() +
-      '</div><div class="sfoot">Updated ' + esc(M.updated) + '<br>' + FLYERS.length + ' flyers from ' + new Set(FLYERS.map(f => f.m)).size + ' stores' +
+      '</div><div class="sfoot">Updated ' + esc(M.updated) + '<br>' + fl.length + ' flyers from ' + new Set(fl.map(f => f.m)).size + ' stores in your range' +
       (M.failures ? '<br><b>' + M.failures + ' downloads failed</b>' : '') + '<br><br>' + esc(M.notCovered) + '</div>';
     $('#side').innerHTML = h;
     $('#mtop').innerHTML = '<a class="brand" href="#/">dealfinder</a>' + locButton('loc');
@@ -686,7 +698,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 
   function emptyRange(what) {
     return '<div class="empty"><b>' + esc(what) + ' within ' + S.loc.km + ' km of ' + esc(areaName()) + '</b>' +
-      'Try a bigger range or another postal code. Deals are gathered for Windsor-Essex flyers.<br><br>' +
+      (myRegion() ? 'Try a bigger range or another postal code.'
+        : 'This page collects flyers for ' + esc(listJoin(REGIONS)) + ' only, so there are no deals near ' + esc(areaName()) + ' yet.') + '<br><br>' +
       '<button type="button" class="btn solid" data-loc>Change location or range</button></div>';
   }
 
@@ -704,7 +717,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
       '<div class="lacts"><button type="submit" class="btn solid">Show deals</button>' +
       '<button type="button" class="btn" id="locgps">' + ICON.pin + 'Use my location</button></div>' +
       '<p class="lmsg" id="locmsg" role="status"></p></form>' +
-      '<p class="muted" style="font-size:12.5px;margin:4px 0 0">Distances are straight-line to each store\'s nearest location. Store locations come from OpenStreetMap.</p></div></div>';
+      '<p class="muted" style="font-size:12.5px;margin:4px 0 0">Flyers are collected for ' + esc(listJoin(REGIONS)) + '. Distances are straight-line to each store\'s nearest location. Store locations come from OpenStreetMap.</p></div></div>';
     document.body.style.overflow = 'hidden';
     setTimeout(() => $('#locpc') && $('#locpc').focus(), 30);
   }
@@ -760,7 +773,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     dedupe(areaItems()).forEach(x => { counts[x.m] = (counts[x.m] || 0) + 1; });
     const fl = areaFlyers();
     const flyerOf = m => fl.find(f => f.m === m);
-    const unmapped = [...new Set(fl.map(f => f.m))].filter(m => !HAS_STORES.has(m));
+    const unmapped = [...new Set(fl.map(f => f.m))].filter(m => !mapped(m));
     const row = (x, i) => {
       const f = flyerOf(x.st.m);
       return '<div class="mrow" data-mi="' + i + '" tabindex="0">' + (LOGO[x.st.m] ? '<img src="' + esc(LOGO[x.st.m]) + '" alt="">' : '<span></span>') +
@@ -1045,7 +1058,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
     if (x.op) desc.push('Regular price ' + esc(x.op));
     if (x.b.length) desc.push('Brand: ' + esc(x.b.join(', ')));
     desc.push('Aisle: <a href="#/aisle/' + encodeURIComponent(x.d) + '" style="color:var(--blue)">' + esc(x.d) + '</a>');
-    const nb = HAS_STORES.has(x.m) && NEAR[x.m];
+    const nb = mapped(x.m) && NEAR[x.m];
     desc.push(nb ? 'Nearest store: ' + esc(nb.st.n) + (nb.st.a ? ', ' + esc(nb.st.a) : '') + ' &middot; <b>' + esc(fmtKm(nb.d)) + '</b> <a href="#/map" style="color:var(--blue)">map</a>'
       : 'Flyer covers: ' + esc(x.ar.join(', ')));
     const sims = similar(x);
